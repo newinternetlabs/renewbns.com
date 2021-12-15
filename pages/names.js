@@ -3,7 +3,12 @@ import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
 
-import { userSession } from "../utils/auth";
+import {
+  userSession,
+  stxAddress,
+  addressName,
+  resolveName,
+} from "../utils/auth";
 
 /**
   Used to disable server-side rendering on this page
@@ -23,12 +28,35 @@ class Names extends React.Component {
   }
   state = {
     userData: null,
+    names: [],
   };
 
   handleSignOut(e) {
     e.preventDefault();
     this.setState({ userData: null });
     userSession.signUserOut(window.location);
+  }
+
+  componentDidMount() {
+    if (userSession.isSignInPending()) {
+      userSession.handlePendingSignIn().then((userData) => {
+        window.history.replaceState({}, document.title, "/names");
+        console.log(userData);
+        this.setState({ userData: userData });
+      });
+    } else if (userSession.isUserSignedIn()) {
+      let address = stxAddress();
+      console.log(address);
+      addressName(address).then((name) => {
+        console.log(name);
+        return resolveName(name).then((result) => {
+          console.log(result);
+          this.setState({ names: [{ name, address, data: result }] });
+        });
+      });
+
+      this.setState({ userData: userSession.loadUserData() });
+    }
   }
 
   render() {
@@ -46,6 +74,7 @@ class Names extends React.Component {
               <App
                 userData={this.state.userData}
                 signOut={this.handleSignOut}
+                names={this.state.names}
               />
             )}
           </main>

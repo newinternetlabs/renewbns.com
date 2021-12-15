@@ -1,6 +1,6 @@
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { authenticate } from "../utils/auth";
-const SignIn = (props: { message: String }) => {
+const SignIn = (props: {}) => {
   return (
     <>
       {/*

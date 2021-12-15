@@ -10,8 +10,10 @@
   "dependencies": {
     "@headlessui/react": "^1.4.2",
     "@heroicons/react": "^1.0.5",
-    "@stacks/connect": "^6.4.0",
+    "@stacks/connect-react": "^13.0.0",
+    "@stacks/network": "^3.0.0",
     "@stacks/profile": "^3.0.0",
+    "@stacks/transactions": "^3.0.0",
     "@tailwindcss/forms": "^0.4.0",
     "next": "12.0.7",
     "react": "17.0.2",
