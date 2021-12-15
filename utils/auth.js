@@ -2,38 +2,26 @@ import {
   AppConfig,
   UserSession,
   showConnect,
-  useConnect,
   openContractCall,
 } from "@stacks/connect-react";
 import { Person } from "@stacks/profile";
 import {
   uintCV,
   bufferCVFromString,
-  bufferCV,
-  someCV,
   callReadOnlyFunction,
   makeStandardSTXPostCondition,
-  makeStandardNonFungiblePostCondition,
   FungibleConditionCode,
-  NonFungibleConditionCode,
-  createAssetInfo,
-  PostConditionMode,
   cvToJSON,
-  hash160,
   standardPrincipalCV,
-  tupleCV,
 } from "@stacks/transactions";
 
 import BN from "bn.js";
 
-import { StacksMainnet, StacksTestnet, StacksMocknet } from "@stacks/network";
-// TODO we don't need these permissions
+import { StacksMainnet } from "@stacks/network";
 const appConfig = new AppConfig([]);
 
 export const CONTRACT_ADDRESS = "SP000000000000000000002Q6VF78";
 export const CONTRACT_NAME = "bns";
-export const DOMAIN_COST_STX = 2000000; // 2 STX - .btc
-
 export const stacksConnectOptions = {
   appDetails: {
     name: "renewbns.com",
@@ -144,7 +132,6 @@ async function contractWrite(func, args, postConditions, attachment) {
       ];
   return new Promise((resolve, reject) => {
     openContractCall({
-      //userSession: userSession,
       stxAddress: address,
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -156,30 +143,19 @@ async function contractWrite(func, args, postConditions, attachment) {
       attachment: undefined,
       appDetails: stacksConnectOptions.appDetails,
       onFinish: resolve,
-      //TODO- Uncomment this once onCancel is implemented in Connect. This is
-      // removed for now because different places in the app might not expect
-      // this behaviour. (There is currently no way to tell if the popup closed,
-      // so it is leaving dangling promises for now.)
-      //onCancel: reject
     });
   });
 }
 
-export async function renewName(name) {
+export async function renewName(name, price) {
   let tokens = name.split(".");
   let namespace = tokens[1];
   let label = tokens[0];
-  if (namespace != "btc") {
-    throw new Error("only works with .btc names now");
-  }
+
   return await contractWrite(
     "name-renewal",
-    [
-      bufferCVFromString(namespace),
-      bufferCVFromString(label),
-      uintCV(DOMAIN_COST_STX),
-    ],
-    DOMAIN_COST_STX,
+    [bufferCVFromString(namespace), bufferCVFromString(label), uintCV(price)],
+    price,
     null
   );
 }

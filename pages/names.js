@@ -31,6 +31,10 @@ class Names extends React.Component {
   state = {
     userData: null,
     names: [],
+    currentBlock: 0,
+    legacy: false,
+    address: "",
+    price: 0,
   };
 
   handleSignOut(e) {
@@ -39,9 +43,9 @@ class Names extends React.Component {
     userSession.signUserOut(window.location);
   }
 
-  renew(e, name) {
+  renew(e, name, price) {
     e.preventDefault();
-    renewName(name);
+    renewName(name, price);
   }
 
   componentDidMount() {
@@ -53,16 +57,50 @@ class Names extends React.Component {
       });
     } else if (userSession.isUserSignedIn()) {
       let address = stxAddress();
+      this.setState({ address });
       console.log(address);
       addressName(address).then((name) => {
-        console.log(name);
+        let legacy = false;
+        if (name === false && this.state.userData.username) {
+          // try legacy name
+          name = this.state.userData.username;
+          legacy = true;
+        }
         return resolveName(name).then((result) => {
           console.log(result);
-          this.setState({ names: [{ name, address, data: result }] });
+          fetch(
+            "https://stacks-node-api.mainnet.stacks.co/v2/prices/names/" + name
+          ).then((response) => {
+            return response.json().then((json) => {
+              console.log(json);
+              let price = json.amount;
+              this.setState({
+                names: [
+                  {
+                    name,
+                    address: result.owner.value,
+                    data: result,
+                    legacy,
+                    price,
+                  },
+                ],
+              });
+            });
+          });
         });
       });
 
       this.setState({ userData: userSession.loadUserData() });
+
+      fetch("https://stacks-node-api.mainnet.stacks.co/v2/info").then(
+        (response) => {
+          return response.json().then((json) => {
+            this.setState({
+              currentBlock: parseInt(json["stacks_tip_height"]),
+            });
+          });
+        }
+      );
     }
   }
 
@@ -83,6 +121,8 @@ class Names extends React.Component {
                 signOut={this.handleSignOut}
                 names={this.state.names}
                 renew={this.renew}
+                currentBlock={this.state.currentBlock}
+                address={this.state.address}
               />
             )}
           </main>

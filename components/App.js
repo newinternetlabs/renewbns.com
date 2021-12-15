@@ -1,15 +1,10 @@
 import React, { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
+import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import { getUserData } from "../utils/auth";
 import Name from "../components/Name";
+import WarningAlertWithLink from "../components/WarningAlertWithLink";
 
-const user = {
-  name: "Tom Cook",
-  email: "tom@example.com",
-  imageUrl:
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-};
 const navigation = [{ name: "Names", href: "/names/", current: true }];
 const userNavigation = [{ name: "Sign out", href: "#" }];
 
@@ -78,24 +73,18 @@ class App extends React.Component {
                       </div>
                     </div>
                     <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                      <button
-                        type="button"
-                        className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        <span className="sr-only">View notifications</span>
-                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
-
                       {/* Profile dropdown */}
                       <Menu as="div" className="ml-3 relative">
                         <div>
                           <Menu.Button className="bg-white flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             <span className="sr-only">Open user menu</span>
-                            <img
-                              className="h-8 w-8 rounded-full"
-                              src={user.imageUrl}
-                              alt=""
-                            />
+                            <svg
+                              className="h-8 w-8 rounded-full text-gray-300"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
                           </Menu.Button>
                         </div>
                         <Transition
@@ -167,27 +156,15 @@ class App extends React.Component {
                   <div className="pt-4 pb-3 border-t border-gray-200">
                     <div className="flex items-center px-4">
                       <div className="flex-shrink-0">
-                        <img
-                          className="h-10 w-10 rounded-full"
-                          src={user.imageUrl}
-                          alt=""
-                        />
+                        <svg
+                          className="h-10 w-10 rounded-full text-gray-300"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
                       </div>
-                      <div className="ml-3">
-                        <div className="text-base font-medium text-gray-800">
-                          {user.name}
-                        </div>
-                        <div className="text-sm font-medium text-gray-500">
-                          {user.email}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        className="ml-auto bg-white flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        <span className="sr-only">View notifications</span>
-                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
+                      <div className="ml-3"></div>
                     </div>
                     <div className="mt-3 space-y-1">
                       {userNavigation.map((item) => (
@@ -209,9 +186,9 @@ class App extends React.Component {
 
           <div className="py-10">
             <header>
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
                 <h1 className="text-3xl font-bold leading-tight text-gray-900">
-                  Your names
+                  Your name
                 </h1>
               </div>
             </header>
@@ -221,13 +198,27 @@ class App extends React.Component {
                 <div className="bg-white shadow overflow-hidden sm:rounded-md">
                   <ul role="list" className="divide-y divide-gray-200">
                     {this.props.names.map((name) => (
-                      <Name
-                        key={name.name}
-                        name={name.name}
-                        address={name.address}
-                        expiry={name.data["lease-ending-at"].value.value}
-                        renew={this.props.renew}
-                      />
+                      <div key={name.name}>
+                        {name.legacy ? (
+                          <WarningAlertWithLink
+                            className="pt-4"
+                            message={
+                              "Your name cannot be renewed through this app because it was registered using a legacy key derivation path not currently supported by wallets."
+                            }
+                          />
+                        ) : null}
+                        <Name
+                          name={name.name}
+                          address={name.address}
+                          expiry={parseInt(
+                            name.data["lease-ending-at"].value.value
+                          )}
+                          renew={this.props.renew}
+                          legacy={name.legacy}
+                          currentBlock={this.props.currentBlock}
+                          price={name.price}
+                        />
+                      </div>
                     ))}
                   </ul>
                 </div>
