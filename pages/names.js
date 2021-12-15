@@ -73,7 +73,7 @@ class Names extends React.Component {
           ).then((response) => {
             return response.json().then((json) => {
               console.log(json);
-              let price = json.amount;
+              let price = parseInt(json.amount);
               this.setState({
                 names: [
                   {
