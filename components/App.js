@@ -226,6 +226,7 @@ class App extends React.Component {
                         name={name.name}
                         address={name.address}
                         expiry={name.data["lease-ending-at"].value.value}
+                        renew={this.props.renew}
                       />
                     ))}
                   </ul>

@@ -8,6 +8,7 @@ import {
   stxAddress,
   addressName,
   resolveName,
+  renewName,
 } from "../utils/auth";
 
 /**
@@ -25,6 +26,7 @@ class Names extends React.Component {
   constructor(props) {
     super(props);
     this.handleSignOut = this.handleSignOut.bind(this);
+    this.renew = this.renew.bind(this);
   }
   state = {
     userData: null,
@@ -35,6 +37,11 @@ class Names extends React.Component {
     e.preventDefault();
     this.setState({ userData: null });
     userSession.signUserOut(window.location);
+  }
+
+  renew(e, name) {
+    e.preventDefault();
+    renewName(name);
   }
 
   componentDidMount() {
@@ -75,6 +82,7 @@ class Names extends React.Component {
                 userData={this.state.userData}
                 signOut={this.handleSignOut}
                 names={this.state.names}
+                renew={this.renew}
               />
             )}
           </main>

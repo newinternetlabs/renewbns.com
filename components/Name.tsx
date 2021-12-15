@@ -5,9 +5,14 @@ import {
   KeyIcon,
 } from "@heroicons/react/solid";
 
-const Name = (props: { name: string; address: string; expiry: number }) => {
+const Name = (props: {
+  name: string;
+  address: string;
+  expiry: number;
+  renew: Function;
+}) => {
   return (
-    <li>
+    <li onClick={(e) => props.renew(e, props.name)}>
       <a href="#" className="block hover:bg-gray-50">
         <div className="px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between">
