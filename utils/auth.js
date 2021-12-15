@@ -6,6 +6,7 @@ import {
 } from "@stacks/connect-react";
 import { Person } from "@stacks/profile";
 import {
+  noneCV,
   uintCV,
   bufferCVFromString,
   callReadOnlyFunction,
@@ -151,10 +152,16 @@ export async function renewName(name, price) {
   let tokens = name.split(".");
   let namespace = tokens[1];
   let label = tokens[0];
-
+  console.log(`namespace: ${namespace}, label: ${label}`);
   return await contractWrite(
     "name-renewal",
-    [bufferCVFromString(namespace), bufferCVFromString(label), uintCV(price)],
+    [
+      bufferCVFromString(namespace),
+      bufferCVFromString(label),
+      uintCV(price),
+      noneCV(),
+      noneCV(),
+    ],
     price,
     null
   );
