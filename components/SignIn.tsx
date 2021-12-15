@@ -27,6 +27,7 @@ const SignIn = (props: { message: String }) => {
               <a
                 href="https://www.newinternetlabs.com/bns/"
                 target="_blank"
+                rel="noreferrer"
                 className="font-medium text-indigo-600 hover:text-indigo-500"
               >
                 learn more about BNS.
