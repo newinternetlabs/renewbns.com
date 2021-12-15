@@ -14,6 +14,8 @@ import {
   FungibleConditionCode,
   cvToJSON,
   standardPrincipalCV,
+  AnchorMode,
+  PostConditionMode,
 } from "@stacks/transactions";
 
 import BN from "bn.js";
@@ -140,6 +142,7 @@ async function contractWrite(func, args, postConditions, attachment) {
       functionArgs: args,
       validateWithAbi: true,
       network: NETWORK,
+      anchorMode: AnchorMode.Any,
       postConditions: postConditions,
       attachment: undefined,
       appDetails: stacksConnectOptions.appDetails,
@@ -162,7 +165,7 @@ export async function renewName(name, price) {
       noneCV(),
       noneCV(),
     ],
-    price,
+    null,
     null
   );
 }
