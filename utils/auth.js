@@ -169,3 +169,9 @@ export async function renewName(name, price) {
     null
   );
 }
+
+export async function renewLegacyName(name, ownerPrivateKey) {
+  //
+}
+
+export function deriveLegacyOwnerKey() {}

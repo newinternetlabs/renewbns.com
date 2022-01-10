@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
+import SecretKeyModal from "../components/SecretKeyModal";
 
 import {
   userSession,
@@ -27,6 +28,7 @@ class Names extends React.Component {
     super(props);
     this.handleSignOut = this.handleSignOut.bind(this);
     this.renew = this.renew.bind(this);
+    this.setSecretKey = this.setSecretKey.bind(this);
   }
   state = {
     userData: null,
@@ -46,6 +48,11 @@ class Names extends React.Component {
   renew(e, name, price) {
     e.preventDefault();
     renewName(name, price);
+  }
+
+  setSecretKey(e, secretKey) {
+    e.preventDefault();
+    console.log(secretKey);
   }
 
   componentDidMount() {
@@ -113,6 +120,7 @@ class Names extends React.Component {
           </Head>
 
           <main>
+            <SecretKeyModal setSecretKey={this.setSecretKey} />
             {!userSession.isUserSignedIn() ? (
               <SignIn />
             ) : (
@@ -123,6 +131,7 @@ class Names extends React.Component {
                 renew={this.renew}
                 currentBlock={this.state.currentBlock}
                 address={this.state.address}
+                setSecretKey={this.setSecretKey}
               />
             )}
           </main>
