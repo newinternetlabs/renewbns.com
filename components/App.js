@@ -199,7 +199,7 @@ class App extends React.Component {
                   <ul role="list" className="divide-y divide-gray-200">
                     {this.props.names.map((name) => (
                       <div key={name.name}>
-                        {name.legacy ? (
+                        {name.legacy && false ? (
                           <WarningAlertWithLink
                             className="pt-4"
                             message={
@@ -217,6 +217,11 @@ class App extends React.Component {
                           legacy={name.legacy}
                           currentBlock={this.props.currentBlock}
                           price={name.price}
+                          startLegacyRenew={this.props.startLegacyRenew}
+                          showSecretKeyModal={this.props.showSecretKeyModal}
+                          setShowSecretKeyModal={
+                            this.props.setShowSecretKeyModal
+                          }
                         />
                       </div>
                     ))}

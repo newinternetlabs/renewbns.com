@@ -28,7 +28,9 @@ class Names extends React.Component {
     super(props);
     this.handleSignOut = this.handleSignOut.bind(this);
     this.renew = this.renew.bind(this);
+    this.startLegacyRenew = this.startLegacyRenew.bind(this);
     this.setSecretKey = this.setSecretKey.bind(this);
+    this.setShowSecretKeyModal = this.setShowSecretKeyModal.bind(this);
   }
   state = {
     userData: null,
@@ -37,6 +39,8 @@ class Names extends React.Component {
     legacy: false,
     address: "",
     price: 0,
+    secretKey: null,
+    showSecretKeyModal: false,
   };
 
   handleSignOut(e) {
@@ -45,9 +49,20 @@ class Names extends React.Component {
     userSession.signUserOut(window.location);
   }
 
+  setShowSecretKeyModal(value) {
+    this.setState({ setShowSecretKeyModal: value });
+  }
+
+  show;
+
   renew(e, name, price) {
     e.preventDefault();
     renewName(name, price);
+  }
+
+  startLegacyRenew(e, name, price) {
+    e.preventDefault();
+    this.setState({ secretKey: null, showSecretKeyModal: true });
   }
 
   setSecretKey(e, secretKey) {
@@ -120,7 +135,6 @@ class Names extends React.Component {
           </Head>
 
           <main>
-            <SecretKeyModal setSecretKey={this.setSecretKey} />
             {!userSession.isUserSignedIn() ? (
               <SignIn />
             ) : (
@@ -132,6 +146,9 @@ class Names extends React.Component {
                 currentBlock={this.state.currentBlock}
                 address={this.state.address}
                 setSecretKey={this.setSecretKey}
+                startLegacyRenew={this.startLegacyRenew}
+                showSecretKeyModal={this.state.showSecretKeyModal}
+                setShowSecretKeyModal={this.setShowSecretKeyModal}
               />
             )}
           </main>

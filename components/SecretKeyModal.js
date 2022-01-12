@@ -17,12 +17,23 @@ import {
   DerivationType,
   selectStxDerivation,
 } from "@stacks/wallet-sdk";
+import { renewLegacyName } from "../utils/auth";
 
 export default function SecretKeyModal(props) {
-  const [open, setOpen] = useState(true);
   const [secret, setSecret] = useState("");
   const [validSecret, setValidSecret] = useState(false);
+  const [ownerAccount, setOwnerAccount] = useState(null);
+  const [walletAccount, setWalletAccount] = useState(null);
+
+  const generateRenewal = (event) => {
+    event.preventDefault();
+    console.log("generateRenewal(): owner account");
+    console.log(ownerAccount);
+    renewLegacyName(props.name, ownerAccount, walletAccount, props.price);
+  };
+
   const updateSecret = (event) => {
+    console.log("start updateSecret()");
     console.log(validSecret);
     const phrase = event.target.value;
     setSecret((previousState) => {
@@ -31,9 +42,8 @@ export default function SecretKeyModal(props) {
 
     mnemonicToSeed(phrase)
       .then((rootPrivateKey) => {
-        setValidSecret(() => {
-          return true;
-        });
+        console.log("mnemonicToSeed succeeded");
+
         const rootNode1 = fromSeed(rootPrivateKey);
         deriveWalletKeys(rootNode1).then((derived) => {
           const rootNode = fromBase58(derived.rootKey);
@@ -44,13 +54,33 @@ export default function SecretKeyModal(props) {
             stxDerivationType: DerivationType.Data,
           });
 
+          const walletAccount = deriveAccount({
+            rootNode,
+            index: 0,
+            salt: derived.salt,
+            stxDerivationType: DerivationType.Wallet,
+          });
           const address = getStxAddress({
             account,
             transactionVersion: TransactionVersion.Mainnet,
           });
 
-          console.log("address");
-          console.log(address);
+          console.log(
+            `address: ${address} target address: ${props.targetAddress}`
+          );
+          setValidSecret(() => {
+            if (address == props.targetAddress) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+          setOwnerAccount(() => {
+            return account;
+          });
+          setWalletAccount(() => {
+            return walletAccount;
+          });
         });
       })
       .catch((error) => {
@@ -88,11 +118,11 @@ export default function SecretKeyModal(props) {
   };
 
   return (
-    <Transition.Root show={open} as={Fragment}>
+    <Transition.Root show={props.showModal} as={Fragment}>
       <Dialog
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
-        onClose={setOpen}
+        onClose={props.setShowModal}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
@@ -128,7 +158,7 @@ export default function SecretKeyModal(props) {
                 <button
                   type="button"
                   className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={() => setOpen(false)}
+                  onClick={() => props.setShowModal(false)}
                 >
                   <span className="sr-only">Close</span>
                   <XIcon className="h-6 w-6" aria-hidden="true" />
@@ -146,7 +176,7 @@ export default function SecretKeyModal(props) {
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
                   >
-                    Renew name
+                    Renew {props.name}
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
@@ -169,17 +199,19 @@ export default function SecretKeyModal(props) {
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={(e) => {
-                    setOpen(false);
-                    props.setSecretKey(e, secret);
+                    props.setShowModal(false);
+                    generateRenewal(e);
                   }}
                   disabled={!validSecret}
                 >
-                  {validSecret ? "Generate renewal" : "Invalid Secret"}
+                  {validSecret
+                    ? `Renew now: ${props.price / 1000000.0} STX`
+                    : "Invalid Secret"}
                 </button>
                 <button
                   type="button"
                   className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                  onClick={() => setOpen(false)}
+                  onClick={() => props.setShowModal(false)}
                 >
                   Cancel
                 </button>

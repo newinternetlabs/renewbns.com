@@ -5,6 +5,8 @@ import {
   KeyIcon,
 } from "@heroicons/react/solid";
 
+import SecretKeyModal from "../components/SecretKeyModal";
+
 const Name = (props: {
   name: string;
   address: string;
@@ -13,9 +15,19 @@ const Name = (props: {
   currentBlock: number;
   legacy: boolean;
   price: number;
+  startLegacyRenew: Function;
+  showSecretKeyModal: boolean;
+  setShowSecretKeyModal: Function;
 }) => {
   return (
     <li>
+      <SecretKeyModal
+        showModal={props.showSecretKeyModal}
+        setShowModal={props.setShowSecretKeyModal}
+        name={props.name}
+        price={props.price}
+        targetAddress={props.address}
+      />
       <div className="block hover:bg-gray-50">
         <div className="px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between">
@@ -48,12 +60,13 @@ const Name = (props: {
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
               {props.legacy ? (
                 <button
-                  onClick={(e) => props.renew(e, props.name)}
+                  onClick={(e) =>
+                    props.startLegacyRenew(e, props.name, props.price)
+                  }
                   type="button"
-                  className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  disabled
+                  className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Unsupported name
+                  Renew for: {props.price / 1000000.0} STX
                 </button>
               ) : (
                 <button

@@ -16,6 +16,9 @@ import {
   standardPrincipalCV,
   AnchorMode,
   PostConditionMode,
+  makeContractCall,
+  sponsorTransaction,
+  broadcastTransaction,
 } from "@stacks/transactions";
 
 import BN from "bn.js";
@@ -170,8 +173,95 @@ export async function renewName(name, price) {
   );
 }
 
-export async function renewLegacyName(name, ownerPrivateKey) {
-  //
+/**********************************************************************/
+
+async function contractLegacyWrite(
+  func,
+  args,
+  postConditions,
+  attachment,
+  owner,
+  wallet
+) {
+  let address = stxAddress();
+  if (!address) throw Error("Not signed in");
+  if (!Array.isArray(postConditions))
+    postConditions = typeof postConditions === "number" &&
+      postConditions > 0 && [
+        makeStandardSTXPostCondition(
+          address,
+          FungibleConditionCode.Equal,
+          new BN(postConditions)
+        ),
+      ];
+  console.log("calling makeContractCall()");
+  const tx = await makeContractCall({
+    stxAddress: address,
+    senderKey: owner.stxPrivateKey,
+    sponsored: true,
+    contractAddress: CONTRACT_ADDRESS,
+    contractName: CONTRACT_NAME,
+    functionName: func,
+    functionArgs: args,
+    validateWithAbi: true,
+    network: NETWORK,
+    anchorMode: AnchorMode.Any,
+    postConditions: postConditions,
+    attachment: undefined,
+  });
+  console.log("makeContractCall() resolved:");
+  console.log(tx);
+
+  const completedTransaction = await sponsorTransaction({
+    transaction: tx,
+    fee: new BN(1000000),
+    sponsorPrivateKey: wallet.stxPrivateKey,
+    sponsorNonce: new BN(3),
+  });
+
+  console.log("completed transaction");
+  console.log(completedTransaction);
+  const result = await broadcastTransaction(completedTransaction, NETWORK);
+  console.log("Broadcasted:");
+  console.log(result);
+
+  // return new Promise((resolve, reject) => {
+  //   openContractCall({
+  //     stxAddress: address,
+  //     contractAddress: CONTRACT_ADDRESS,
+  //     contractName: CONTRACT_NAME,
+  //     functionName: func,
+  //     functionArgs: args,
+  //     validateWithAbi: true,
+  //     network: NETWORK,
+  //     anchorMode: AnchorMode.Any,
+  //     postConditions: postConditions,
+  //     attachment: undefined,
+  //     appDetails: stacksConnectOptions.appDetails,
+  //     onFinish: resolve,
+  //   });
+  // });
+}
+
+export async function renewLegacyName(name, owner, wallet, price) {
+  let tokens = name.split(".");
+  let namespace = tokens[1];
+  let label = tokens[0];
+  console.log(`namespace: ${namespace}, label: ${label}`);
+  return await contractLegacyWrite(
+    "name-renewal",
+    [
+      bufferCVFromString(namespace),
+      bufferCVFromString(label),
+      uintCV(price),
+      noneCV(),
+      noneCV(),
+    ],
+    null,
+    null,
+    owner,
+    wallet
+  );
 }
 
 export function deriveLegacyOwnerKey() {}
