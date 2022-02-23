@@ -6,6 +6,8 @@ import {
 } from "@heroicons/react/solid";
 
 import SecretKeyModal from "../components/SecretKeyModal";
+import SignUpModal from "../components/SignUpModal";
+import TransactionSentModal from "../components/TransactionSentModal";
 
 const Name = (props: {
   name: string;
@@ -28,6 +30,7 @@ const Name = (props: {
         price={props.price}
         targetAddress={props.address}
       />
+      <SignUpModal />
       <div className="block hover:bg-gray-50">
         <div className="px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between">
