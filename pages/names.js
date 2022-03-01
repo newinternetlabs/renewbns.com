@@ -10,6 +10,7 @@ import {
   addressName,
   resolveName,
   renewName,
+  transferName,
 } from "../utils/auth";
 
 /**
@@ -31,6 +32,7 @@ class Names extends React.Component {
     this.startLegacyRenew = this.startLegacyRenew.bind(this);
     this.setSecretKey = this.setSecretKey.bind(this);
     this.setShowSecretKeyModal = this.setShowSecretKeyModal.bind(this);
+    this.upgradeName = this.upgradeName.bind(this);
   }
   state = {
     userData: null,
@@ -41,6 +43,7 @@ class Names extends React.Component {
     price: 0,
     secretKey: null,
     showSecretKeyModal: false,
+    walletAddress: null,
   };
 
   handleSignOut(e) {
@@ -62,6 +65,13 @@ class Names extends React.Component {
 
   startLegacyRenew(e, name, price) {
     e.preventDefault();
+    console.log("Start legacy renew");
+    this.setState({ secretKey: null, showSecretKeyModal: true });
+  }
+
+  upgradeName(e, name, walletAddress, zonefileHash) {
+    e.preventDefault();
+    console.log("Upgrade name");
     this.setState({ secretKey: null, showSecretKeyModal: true });
   }
 
@@ -72,30 +82,40 @@ class Names extends React.Component {
 
   componentDidMount() {
     if (userSession.isSignInPending()) {
+      console.log("isSignInPending");
       userSession.handlePendingSignIn().then((userData) => {
+        console.log("handlePendingSignIn");
         window.history.replaceState({}, document.title, "/names");
         console.log(userData);
         this.setState({ userData: userData });
       });
     } else if (userSession.isUserSignedIn()) {
+      console.log("isUserSignedIn");
       let address = stxAddress();
-      this.setState({ address });
+      this.setState({ address, walletAddress: address });
       console.log(address);
+      console.log(this.state.userData);
       addressName(address).then((name) => {
         let legacy = false;
         if (name === false && this.state.userData.username) {
           // try legacy name
           name = this.state.userData.username;
+          console.log(`trying legacy name: ${name}`);
           legacy = true;
         }
+
+        console.log(`resolveName(${name})`);
         return resolveName(name).then((result) => {
           console.log(result);
           fetch(
             "https://stacks-node-api.mainnet.stacks.co/v2/prices/names/" + name
           ).then((response) => {
             return response.json().then((json) => {
-              console.log(json);
               let price = parseInt(json.amount);
+              let zonefileHash = Buffer.from(
+                result["zonefile-hash"].value.substr(2),
+                "hex"
+              );
               this.setState({
                 names: [
                   {
@@ -104,6 +124,7 @@ class Names extends React.Component {
                     data: result,
                     legacy,
                     price,
+                    zonefileHash,
                   },
                 ],
               });
@@ -145,10 +166,12 @@ class Names extends React.Component {
                 renew={this.renew}
                 currentBlock={this.state.currentBlock}
                 address={this.state.address}
+                walletAddress={this.state.walletAddress}
                 setSecretKey={this.setSecretKey}
                 startLegacyRenew={this.startLegacyRenew}
                 showSecretKeyModal={this.state.showSecretKeyModal}
                 setShowSecretKeyModal={this.setShowSecretKeyModal}
+                upgradeName={this.upgradeName}
               />
             )}
           </main>

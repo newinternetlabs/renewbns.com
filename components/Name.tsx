@@ -12,6 +12,7 @@ import TransactionSentModal from "../components/TransactionSentModal";
 const Name = (props: {
   name: string;
   address: string;
+  walletAddress: string;
   expiry: number;
   renew: Function;
   currentBlock: number;
@@ -20,17 +21,21 @@ const Name = (props: {
   startLegacyRenew: Function;
   showSecretKeyModal: boolean;
   setShowSecretKeyModal: Function;
+  upgradeName: Function;
+  zonefileHash: string;
 }) => {
   return (
     <li>
-      {/* }
       <SecretKeyModal
         showModal={props.showSecretKeyModal}
         setShowModal={props.setShowSecretKeyModal}
         name={props.name}
         price={props.price}
         targetAddress={props.address}
+        zonefileHash={props.zonefileHash}
       />
+      {/* }
+      
       <SignUpModal />
         { */}
       <div className="block hover:bg-gray-50">
@@ -64,15 +69,22 @@ const Name = (props: {
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
               {props.legacy ? (
-                <button
-                  onClick={(e) =>
-                    props.startLegacyRenew(e, props.name, props.price)
-                  }
-                  type="button"
-                  className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Renew for: {props.price / 1000000.0} STX
-                </button>
+                <div>
+                  <button
+                    onClick={(e) =>
+                      props.upgradeName(
+                        e,
+                        props.name,
+                        props.walletAddress,
+                        props.zonefileHash
+                      )
+                    }
+                    type="button"
+                    className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Upgrade Legacy Name
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={(e) => props.renew(e, props.name, props.price)}

@@ -199,17 +199,18 @@ class App extends React.Component {
                   <ul role="list" className="divide-y divide-gray-200">
                     {this.props.names.map((name) => (
                       <div key={name.name}>
-                        {name.legacy && false ? (
+                        {name.legacy ? (
                           <WarningAlertWithLink
                             className="pt-4"
                             message={
-                              "Your name cannot be renewed through this app because it was registered using a legacy key derivation path not currently supported by wallets."
+                              "Your pre-Stacks 2.0 legacy name needs to be upgraded before it can be renewed."
                             }
                           />
                         ) : null}
                         <Name
                           name={name.name}
                           address={name.address}
+                          walletAddress={this.props.walletAddress}
                           expiry={parseInt(
                             name.data["lease-ending-at"].value.value
                           )}
@@ -222,6 +223,8 @@ class App extends React.Component {
                           setShowSecretKeyModal={
                             this.props.setShowSecretKeyModal
                           }
+                          upgradeName={this.props.upgradeName}
+                          zonefileHash={name.zonefileHash}
                         />
                       </div>
                     ))}

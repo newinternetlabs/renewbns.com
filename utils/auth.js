@@ -8,10 +8,13 @@ import { Person } from "@stacks/profile";
 import {
   noneCV,
   uintCV,
+  standardPrincipalCVFromAddress,
   bufferCVFromString,
   callReadOnlyFunction,
   makeStandardSTXPostCondition,
+  makeStandardNonFungiblePostCondition,
   FungibleConditionCode,
+  NonFungibleConditionCode,
   cvToJSON,
   standardPrincipalCV,
   AnchorMode,
@@ -19,7 +22,14 @@ import {
   makeContractCall,
   sponsorTransaction,
   broadcastTransaction,
+  bufferCV,
+  someCV,
+  tupleCV,
+  createAssetInfo,
+  TransactionVersion,
 } from "@stacks/transactions";
+
+import { getStxAddress } from "@stacks/wallet-sdk";
 
 import BN from "bn.js";
 
@@ -114,6 +124,7 @@ export async function addressName(address) {
 }
 
 export async function resolveName(name) {
+  console.log("resolveName");
   let tokens = name.split(".");
   let namespace = tokens[1];
   let label = tokens[0];
@@ -173,6 +184,61 @@ export async function renewName(name, price) {
   );
 }
 
+/*
+(define-public (name-transfer (namespace (buff 20))
+                              (name (buff 48))
+                              (new-owner principal)
+                              (zonefile-hash (optional (buff 20))))
+*/
+
+export async function transferName(
+  name,
+  newOwner,
+  zonefileHash,
+  ownerAccount,
+  walletAccount
+) {
+  let tokens = name.split(".");
+  let namespace = tokens[1];
+  let label = tokens[0];
+
+  let ownerAddress = getStxAddress({
+    account: ownerAccount,
+    transactionVersion: TransactionVersion.Mainnet,
+  });
+
+  let assetName = tupleCV({
+    name: bufferCVFromString(label),
+    namespace: bufferCVFromString(namespace),
+  });
+  let asset = createAssetInfo(CONTRACT_ADDRESS, CONTRACT_NAME, "names");
+
+  console.log(
+    `transferName: namespace: ${namespace} label: ${label} newOwner: ${newOwner}`
+  );
+
+  return await contractLegacyWrite(
+    "name-transfer",
+    [
+      bufferCVFromString(namespace),
+      bufferCVFromString(label),
+      standardPrincipalCV(newOwner),
+      zonefileHash ? someCV(bufferCV(zonefileHash)) : noneCV(),
+    ],
+    [
+      makeStandardNonFungiblePostCondition(
+        ownerAddress,
+        NonFungibleConditionCode.DoesNotOwn,
+        asset,
+        assetName
+      ),
+    ],
+    null,
+    ownerAccount,
+    walletAccount
+  );
+}
+
 /**********************************************************************/
 
 async function contractLegacyWrite(
@@ -185,15 +251,15 @@ async function contractLegacyWrite(
 ) {
   let address = stxAddress();
   if (!address) throw Error("Not signed in");
-  if (!Array.isArray(postConditions))
-    postConditions = typeof postConditions === "number" &&
-      postConditions > 0 && [
-        makeStandardSTXPostCondition(
-          address,
-          FungibleConditionCode.Equal,
-          new BN(postConditions)
-        ),
-      ];
+  // if (!Array.isArray(postConditions))
+  //   postConditions = typeof postConditions === "number" &&
+  //     postConditions > 0 && [
+  //       makeStandardSTXPostCondition(
+  //         address,
+  //         FungibleConditionCode.Equal,
+  //         new BN(postConditions)
+  //       ),
+  //     ];
   console.log("calling makeContractCall()");
   const tx = await makeContractCall({
     stxAddress: address,
@@ -207,7 +273,7 @@ async function contractLegacyWrite(
     network: NETWORK,
     anchorMode: AnchorMode.Any,
     postConditions: postConditions,
-    attachment: undefined,
+    attachment,
   });
   console.log("makeContractCall() resolved:");
   console.log(tx);
@@ -216,7 +282,7 @@ async function contractLegacyWrite(
     transaction: tx,
     fee: new BN(1000000),
     sponsorPrivateKey: wallet.stxPrivateKey,
-    sponsorNonce: new BN(3),
+    sponsorNonce: new BN(1), // TODO - get this from api
   });
 
   console.log("completed transaction");
@@ -263,5 +329,4 @@ export async function renewLegacyName(name, owner, wallet, price) {
     wallet
   );
 }
-
 export function deriveLegacyOwnerKey() {}

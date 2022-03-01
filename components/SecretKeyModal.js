@@ -17,7 +17,7 @@ import {
   DerivationType,
   selectStxDerivation,
 } from "@stacks/wallet-sdk";
-import { renewLegacyName } from "../utils/auth";
+import { transferName } from "../utils/auth";
 
 export default function SecretKeyModal(props) {
   const [secret, setSecret] = useState("");
@@ -29,7 +29,13 @@ export default function SecretKeyModal(props) {
     event.preventDefault();
     console.log("generateRenewal(): owner account");
     console.log(ownerAccount);
-    renewLegacyName(props.name, ownerAccount, walletAccount, props.price);
+    transferName(
+      props.name,
+      props.targetAddress,
+      props.zonefileHash,
+      ownerAccount,
+      walletAccount
+    );
   };
 
   const updateSecret = (event) => {
@@ -43,40 +49,63 @@ export default function SecretKeyModal(props) {
     mnemonicToSeed(phrase)
       .then((rootPrivateKey) => {
         console.log("mnemonicToSeed succeeded");
-
         const rootNode1 = fromSeed(rootPrivateKey);
         deriveWalletKeys(rootNode1).then((derived) => {
           const rootNode = fromBase58(derived.rootKey);
-          const account = deriveAccount({
-            rootNode,
-            index: 0,
-            salt: derived.salt,
-            stxDerivationType: DerivationType.Data,
-          });
 
-          const walletAccount = deriveAccount({
-            rootNode,
-            index: 0,
-            salt: derived.salt,
-            stxDerivationType: DerivationType.Wallet,
-          });
-          const address = getStxAddress({
-            account,
-            transactionVersion: TransactionVersion.Mainnet,
-          });
+          /**** start loop ****/
 
-          console.log(
-            `address: ${address} target address: ${props.targetAddress}`
-          );
+          let found = false;
+          const indexLimit = 10;
+          let i = 0;
+          let legacyOwnerAccount = null;
+          let walletAccount = null;
+          let legacyOwnerAddress = null;
+          let walletAccountAddress = null;
+          while (!found && i < indexLimit) {
+            legacyOwnerAccount = deriveAccount({
+              rootNode,
+              index: i,
+              salt: derived.salt,
+              stxDerivationType: DerivationType.Data,
+            });
+
+            walletAccount = deriveAccount({
+              rootNode,
+              index: i,
+              salt: derived.salt,
+              stxDerivationType: DerivationType.Wallet,
+            });
+            legacyOwnerAddress = getStxAddress({
+              account: legacyOwnerAccount,
+              transactionVersion: TransactionVersion.Mainnet,
+            });
+
+            walletAccountAddress = getStxAddress({
+              account: legacyOwnerAccount,
+              transactionVersion: TransactionVersion.Mainnet,
+            });
+            console.log(
+              `index: ${i} - derived walletAccountAddress: ${legacyOwnerAddress} - target address: ${props.targetAddress}`
+            );
+
+            if (walletAccountAddress == props.targetAddress) {
+              console.log(`Found account index #${i}.`);
+              found = true;
+            }
+            i++;
+          }
+
+          /**** end loop ****/
           setValidSecret(() => {
-            if (address == props.targetAddress) {
+            if (found) {
               return true;
             } else {
               return false;
             }
           });
           setOwnerAccount(() => {
-            return account;
+            return legacyOwnerAccount;
           });
           setWalletAccount(() => {
             return walletAccount;
@@ -176,12 +205,17 @@ export default function SecretKeyModal(props) {
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
                   >
-                    Renew {props.name}
+                    Upgrade {props.name}
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      To renew this name, you'll need to enter the secret key
-                      for your wallet.
+                      To upgrade this name, you will need to enter the secret
+                      key for your wallet.
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2 mb-2">
+                      This app will generate a transaction to transfer ownership
+                      of the name to the same account that holds your funds in
+                      your Stacks wallet.
                     </p>
                     <textarea
                       rows={4}
@@ -204,9 +238,7 @@ export default function SecretKeyModal(props) {
                   }}
                   disabled={!validSecret}
                 >
-                  {validSecret
-                    ? `Renew now: ${props.price / 1000000.0} STX`
-                    : "Invalid Secret"}
+                  {validSecret ? `Upgrade ${props.name}` : "Invalid Secret"}
                 </button>
                 <button
                   type="button"
