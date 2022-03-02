@@ -27,6 +27,7 @@ import {
   tupleCV,
   createAssetInfo,
   TransactionVersion,
+  getNonce,
 } from "@stacks/transactions";
 
 import { getStxAddress } from "@stacks/wallet-sdk";
@@ -214,7 +215,7 @@ export async function transferName(
   let asset = createAssetInfo(CONTRACT_ADDRESS, CONTRACT_NAME, "names");
 
   console.log(
-    `transferName: namespace: ${namespace} label: ${label} newOwner: ${newOwner}`
+    `transferName: namespace: ${namespace} label: ${label} existingOwner: ${ownerAddress} newOwner: ${newOwner}`
   );
 
   return await contractLegacyWrite(
@@ -249,8 +250,10 @@ async function contractLegacyWrite(
   owner,
   wallet
 ) {
-  let address = stxAddress();
-  if (!address) throw Error("Not signed in");
+  let ownerAddress = getStxAddress({
+    account: owner,
+    transactionVersion: TransactionVersion.Mainnet,
+  });
   // if (!Array.isArray(postConditions))
   //   postConditions = typeof postConditions === "number" &&
   //     postConditions > 0 && [
@@ -261,10 +264,12 @@ async function contractLegacyWrite(
   //       ),
   //     ];
   console.log("calling makeContractCall()");
-  const tx = await makeContractCall({
-    stxAddress: address,
+
+  const options = {
+    stxAddress: ownerAddress,
     senderKey: owner.stxPrivateKey,
     sponsored: true,
+    nonce: new BN(2), // TODO - get this from api
     contractAddress: CONTRACT_ADDRESS,
     contractName: CONTRACT_NAME,
     functionName: func,
@@ -274,19 +279,29 @@ async function contractLegacyWrite(
     anchorMode: AnchorMode.Any,
     postConditions: postConditions,
     attachment,
-  });
+  };
+
+  console.log(options);
+
+  const tx = await makeContractCall(options);
   console.log("makeContractCall() resolved:");
   console.log(tx);
 
   const completedTransaction = await sponsorTransaction({
     transaction: tx,
-    fee: new BN(1000000), // TODO - dynamically set this
+    fee: new BN(100000), // TODO - dynamically set this
     sponsorPrivateKey: wallet.stxPrivateKey,
-    sponsorNonce: new BN(1), // TODO - get this from api
+    sponsorNonce: new BN(3), // TODO - get this from api
   });
 
   console.log("completed transaction");
   console.log(completedTransaction);
+
+  /*
+   Handle nonce error
+   {"error":"transaction rejected","reason":"ConflictingNonceInMempool","txid":"aa0c597639baedf120291fbd4a30a3996590b1d79bb60bca011346e6a05390bf"}
+  */
+
   return broadcastTransaction(completedTransaction, NETWORK);
   // console.log("Broadcasted:");
   // console.log(result);

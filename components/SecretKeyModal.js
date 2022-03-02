@@ -87,11 +87,11 @@ export default function SecretKeyModal(props) {
             });
 
             walletAccountAddress = getStxAddress({
-              account: legacyOwnerAccount,
+              account: walletAccount,
               transactionVersion: TransactionVersion.Mainnet,
             });
             console.log(
-              `index: ${i} - derived walletAccountAddress: ${legacyOwnerAddress} - target address: ${props.targetAddress}`
+              `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress}`
             );
 
             if (walletAccountAddress == props.targetAddress) {

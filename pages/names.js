@@ -10,7 +10,6 @@ import {
   addressName,
   resolveName,
   renewName,
-  transferName,
 } from "../utils/auth";
 
 /**
@@ -106,6 +105,7 @@ class Names extends React.Component {
     } else if (userSession.isUserSignedIn()) {
       console.log("isUserSignedIn");
       let address = stxAddress();
+      console.log(`setting wallet address: ${address}`);
       this.setState({ address, walletAddress: address });
       console.log(address);
       console.log(this.state.userData);
