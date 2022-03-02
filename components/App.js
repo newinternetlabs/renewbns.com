@@ -225,6 +225,14 @@ class App extends React.Component {
                           }
                           upgradeName={this.props.upgradeName}
                           zonefileHash={name.zonefileHash}
+                          showTransactionSentModal={
+                            this.props.showTransactionSentModal
+                          }
+                          setShowTransactionSentModalValue={
+                            this.props.setShowTransactionSentModalValue
+                          }
+                          transaction={this.props.transaction}
+                          setTransactionValue={this.props.setTransactionValue}
                         />
                       </div>
                     ))}

@@ -33,6 +33,9 @@ class Names extends React.Component {
     this.setSecretKey = this.setSecretKey.bind(this);
     this.setShowSecretKeyModal = this.setShowSecretKeyModal.bind(this);
     this.upgradeName = this.upgradeName.bind(this);
+    this.setShowTransactionSentModalValue =
+      this.setShowTransactionSentModalValue.bind(this);
+    this.setTransactionValue = this.setTransactionValue.bind(this);
   }
   state = {
     userData: null,
@@ -44,6 +47,8 @@ class Names extends React.Component {
     secretKey: null,
     showSecretKeyModal: false,
     walletAddress: null,
+    showTransactionSentModal: false,
+    transaction: "",
   };
 
   handleSignOut(e) {
@@ -53,7 +58,16 @@ class Names extends React.Component {
   }
 
   setShowSecretKeyModal(value) {
-    this.setState({ setShowSecretKeyModal: value });
+    this.setState({ showSecretKeyModal: value });
+  }
+
+  setTransactionValue(value) {
+    console.log(`setTransactionValue(${value})`);
+    this.setState({ transaction: value });
+  }
+
+  setShowTransactionSentModalValue(value) {
+    this.setState({ showTransactionSentModal: value });
   }
 
   show;
@@ -172,6 +186,12 @@ class Names extends React.Component {
                 showSecretKeyModal={this.state.showSecretKeyModal}
                 setShowSecretKeyModal={this.setShowSecretKeyModal}
                 upgradeName={this.upgradeName}
+                showTransactionSentModal={this.state.showTransactionSentModal}
+                setShowTransactionSentModalValue={
+                  this.setShowTransactionSentModalValue
+                }
+                setTransactionValue={this.setTransactionValue}
+                transaction={this.state.transaction}
               />
             )}
           </main>

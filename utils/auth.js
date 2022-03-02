@@ -280,17 +280,17 @@ async function contractLegacyWrite(
 
   const completedTransaction = await sponsorTransaction({
     transaction: tx,
-    fee: new BN(1000000),
+    fee: new BN(1000000), // TODO - dynamically set this
     sponsorPrivateKey: wallet.stxPrivateKey,
     sponsorNonce: new BN(1), // TODO - get this from api
   });
 
   console.log("completed transaction");
   console.log(completedTransaction);
-  const result = await broadcastTransaction(completedTransaction, NETWORK);
-  console.log("Broadcasted:");
-  console.log(result);
-
+  return broadcastTransaction(completedTransaction, NETWORK);
+  // console.log("Broadcasted:");
+  // console.log(result);
+  // return result;
   // return new Promise((resolve, reject) => {
   //   openContractCall({
   //     stxAddress: address,

@@ -25,9 +25,9 @@ export default function SecretKeyModal(props) {
   const [ownerAccount, setOwnerAccount] = useState(null);
   const [walletAccount, setWalletAccount] = useState(null);
 
-  const generateRenewal = (event) => {
+  const upgradeName = (event) => {
     event.preventDefault();
-    console.log("generateRenewal(): owner account");
+    console.log("upgradeName(): owner account");
     console.log(ownerAccount);
     transferName(
       props.name,
@@ -35,7 +35,12 @@ export default function SecretKeyModal(props) {
       props.zonefileHash,
       ownerAccount,
       walletAccount
-    );
+    ).then((txn) => {
+      console.log(`transaction: ${txn.txid}`);
+      props.setTransactionValue(txn.txid);
+      props.setShowModal(false);
+      props.setShowTransactionSentModalValue(true);
+    });
   };
 
   const updateSecret = (event) => {
@@ -234,7 +239,7 @@ export default function SecretKeyModal(props) {
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={(e) => {
                     props.setShowModal(false);
-                    generateRenewal(e);
+                    upgradeName(e);
                   }}
                   disabled={!validSecret}
                 >
