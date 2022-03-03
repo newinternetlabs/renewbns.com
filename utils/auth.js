@@ -268,9 +268,9 @@ async function contractLegacyWrite(
   const options = {
     stxAddress: ownerAddress,
     senderKey: owner.stxPrivateKey,
-    //    sponsored: true,
+    sponsored: true,
     nonce: new BN(0), // TODO - get this from api
-    fee: new BN(100000), // TODO - dynamically set this
+    // fee: new BN(100000), // TODO - dynamically set this
     contractAddress: CONTRACT_ADDRESS,
     contractName: CONTRACT_NAME,
     functionName: func,
@@ -288,12 +288,12 @@ async function contractLegacyWrite(
   console.log("makeContractCall() resolved:");
   console.log(tx);
 
-  // const completedTransaction = await sponsorTransaction({
-  //   transaction: tx,
-  //   fee: new BN(1000000), // TODO - dynamically set this
-  //   sponsorPrivateKey: wallet.stxPrivateKey,
-  //   sponsorNonce: new BN(6), // TODO - get this from api
-  // });
+  const completedTransaction = await sponsorTransaction({
+    transaction: tx,
+    fee: new BN(100000), // TODO - dynamically set this
+    sponsorPrivateKey: wallet.stxPrivateKey,
+    sponsorNonce: new BN(0), // TODO - get this from api
+  });
 
   const legacyOwnerAddress = getStxAddress({
     account: owner,
@@ -308,16 +308,16 @@ async function contractLegacyWrite(
   console.log(
     `completed transaction: wallet: ${walletAccountAddress} owner: ${legacyOwnerAddress}`
   );
-  //console.log(completedTransaction);
+  console.log(completedTransaction);
 
   /*
    Handle nonce error
    {"error":"transaction rejected","reason":"ConflictingNonceInMempool","txid":"aa0c597639baedf120291fbd4a30a3996590b1d79bb60bca011346e6a05390bf"}
   */
 
-  //return broadcastTransaction(completedTransaction, NETWORK);
+  return broadcastTransaction(completedTransaction, NETWORK);
 
-  return broadcastTransaction(tx, NETWORK);
+  //return broadcastTransaction(tx, NETWORK);
   // console.log("Broadcasted:");
   // console.log(result);
   // return result;
