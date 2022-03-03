@@ -37,6 +37,8 @@ import BN from "bn.js";
 import { StacksMainnet } from "@stacks/network";
 const appConfig = new AppConfig([]);
 
+// get next nonce https://stacks-node-api.mainnet.stacks.co/extended/v1/address/{principal}/nonces
+
 export const CONTRACT_ADDRESS = "SP000000000000000000002Q6VF78";
 export const CONTRACT_NAME = "bns";
 export const stacksConnectOptions = {
@@ -250,10 +252,22 @@ async function contractLegacyWrite(
   owner,
   wallet
 ) {
-  let ownerAddress = getStxAddress({
+  const legacyOwnerAddress = getStxAddress({
     account: owner,
     transactionVersion: TransactionVersion.Mainnet,
   });
+
+  const walletAccountAddress = getStxAddress({
+    account: wallet,
+    transactionVersion: TransactionVersion.Mainnet,
+  });
+
+  const nextOwnerNonce = await getNonce(legacyOwnerAddress, NETWORK);
+  const nextWalletNonce = await getNonce(walletAccountAddress, NETWORK);
+  console.log(
+    `nextOwnerNonce: ${nextOwnerNonce} - nextWalletNonce: ${nextWalletNonce}`
+  );
+
   // if (!Array.isArray(postConditions))
   //   postConditions = typeof postConditions === "number" &&
   //     postConditions > 0 && [
@@ -269,7 +283,7 @@ async function contractLegacyWrite(
     stxAddress: ownerAddress,
     senderKey: owner.stxPrivateKey,
     sponsored: true,
-    nonce: new BN(0), // TODO - get this from api
+    nonce: new BN(nextOwnerNonce),
     // fee: new BN(100000), // TODO - dynamically set this
     contractAddress: CONTRACT_ADDRESS,
     contractName: CONTRACT_NAME,
@@ -292,17 +306,7 @@ async function contractLegacyWrite(
     transaction: tx,
     fee: new BN(100000), // TODO - dynamically set this
     sponsorPrivateKey: wallet.stxPrivateKey,
-    sponsorNonce: new BN(0), // TODO - get this from api
-  });
-
-  const legacyOwnerAddress = getStxAddress({
-    account: owner,
-    transactionVersion: TransactionVersion.Mainnet,
-  });
-
-  const walletAccountAddress = getStxAddress({
-    account: wallet,
-    transactionVersion: TransactionVersion.Mainnet,
+    sponsorNonce: new BN(nextWalletNonce),
   });
 
   console.log(
