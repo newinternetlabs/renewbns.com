@@ -1,9 +1,4 @@
-import {
-  CalendarIcon,
-  LocationMarkerIcon,
-  UsersIcon,
-  KeyIcon,
-} from "@heroicons/react/solid";
+import { CalendarIcon, KeyIcon } from "@heroicons/react/solid";
 
 import SecretKeyModal from "../components/SecretKeyModal";
 import SignUpModal from "../components/SignUpModal";

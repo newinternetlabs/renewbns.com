@@ -1,23 +1,16 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
-// import keychain, { deriveRootKeychainFromMnemonic } from "@stacks/keychain";
-import { ChainID, getAddressFromPrivateKey } from "@stacks/transactions";
-import { publicKeyToAddress, ecPairToHexString } from "@stacks/encryption";
-// import { ECPair, bip32, networks } from "bitcoinjs-lib";
 import { mnemonicToSeed } from "bip39";
 import { fromBase58, fromSeed } from "bip32";
 import { TransactionVersion } from "@stacks/transactions";
-import { StacksMainnet } from "@stacks/network";
 import {
   deriveWalletKeys,
   deriveAccount,
   getStxAddress,
-  deriveLegacyConfigPrivateKey,
   DerivationType,
-  selectStxDerivation,
 } from "@stacks/wallet-sdk";
-import { transferName } from "../utils/auth";
+import { transferName } from "../utils/names";
 
 export default function SecretKeyModal(props) {
   const [secret, setSecret] = useState("");
@@ -65,7 +58,6 @@ export default function SecretKeyModal(props) {
           let i = 0;
           let legacyOwnerAccount = null;
           let walletAccount = null;
-          let legacyOwnerAddress = null;
           let walletAccountAddress = null;
           while (!found && i < indexLimit) {
             legacyOwnerAccount = deriveAccount({
@@ -80,10 +72,6 @@ export default function SecretKeyModal(props) {
               index: i,
               salt: derived.salt,
               stxDerivationType: DerivationType.Wallet,
-            });
-            legacyOwnerAddress = getStxAddress({
-              account: legacyOwnerAccount,
-              transactionVersion: TransactionVersion.Mainnet,
             });
 
             walletAccountAddress = getStxAddress({
@@ -123,32 +111,6 @@ export default function SecretKeyModal(props) {
           return false;
         });
       });
-
-    // keychain.Wallet.restore("12345678", phrase, ChainID.Mainnet)
-    //   .then((restored) => {
-    //     setValidSecret(() => {
-    //       return true;
-    //     });
-    //     console.log("restored");
-    //     console.log(restored);
-    //     console.log("identities");
-    //     console.log(restored.identities);
-    //     console.log(`stxNodeKey: ${restored.identities[0].keyPair.stxNodeKey}`);
-    //     const stxNode = bip32.fromBase58(
-    //       restored.identities[0].keyPair.stxNodeKey,
-    //       networks.bitcoin
-    //     );
-    //     const pair = ECPair.fromWIF(stxNode.toWIF());
-    //     console.log(getAddressFromPrivateKey(ecPairToHexString(pair)));
-    //     console.log("stx wallet address");
-    //     console.log(restored.getSigner().getSTXAddress());
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     setValidSecret(() => {
-    //       return false;
-    //     });
-    //   });
   };
 
   return (

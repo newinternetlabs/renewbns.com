@@ -2,16 +2,15 @@ import React from "react";
 import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
-import SecretKeyModal from "../components/SecretKeyModal";
+
+import { userSession, stxAddress } from "../utils/auth";
 
 import {
-  userSession,
-  stxAddress,
+  getCurrentBlock,
   addressName,
   resolveName,
   renewName,
-} from "../utils/auth";
-
+} from "../utils/names";
 /**
   Used to disable server-side rendering on this page
 */
@@ -23,7 +22,7 @@ function SafeHydrate({ children }) {
   );
 }
 
-class Names extends React.Component {
+class Index extends React.Component {
   constructor(props) {
     super(props);
     this.handleSignOut = this.handleSignOut.bind(this);
@@ -98,8 +97,7 @@ class Names extends React.Component {
       console.log("isSignInPending");
       userSession.handlePendingSignIn().then((userData) => {
         console.log("handlePendingSignIn");
-        window.history.replaceState({}, document.title, "/names");
-        console.log(userData);
+        window.history.replaceState({}, document.title, "/");
         this.setState({ userData: userData });
       });
     } else if (userSession.isUserSignedIn()) {
@@ -107,12 +105,10 @@ class Names extends React.Component {
       let address = stxAddress();
       console.log(`setting wallet address: ${address}`);
       this.setState({ address, walletAddress: address });
-      console.log(address);
-      console.log(this.state.userData);
       addressName(address).then((name) => {
         let legacy = false;
+        // try legacy name
         if (name === false && this.state.userData.username) {
-          // try legacy name
           name = this.state.userData.username;
           console.log(`trying legacy name: ${name}`);
           legacy = true;
@@ -149,15 +145,11 @@ class Names extends React.Component {
 
       this.setState({ userData: userSession.loadUserData() });
 
-      fetch("https://stacks-node-api.mainnet.stacks.co/v2/info").then(
-        (response) => {
-          return response.json().then((json) => {
-            this.setState({
-              currentBlock: parseInt(json["stacks_tip_height"]),
-            });
-          });
-        }
-      );
+      getCurrentBlock().then((currentBlock) => {
+        this.setState({
+          currentBlock,
+        });
+      });
     }
   }
 
@@ -203,4 +195,4 @@ class Names extends React.Component {
   }
 }
 
-export default Names;
+export default Index;

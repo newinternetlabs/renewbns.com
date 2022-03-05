@@ -3,14 +3,6 @@ import { authenticate } from "../utils/auth";
 const SignIn = (props: {}) => {
   return (
     <>
-      {/*
-		This example requires updating your template:
-	
-		```
-		<html class="h-full bg-gray-50">
-		<body class="h-full">
-		```
-	  */}
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div>
@@ -20,7 +12,7 @@ const SignIn = (props: {}) => {
               alt="New Internet Labs logo"
             />
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Connect your Stacks Wallet
+              Renew your BNS name
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{" "}
@@ -46,7 +38,7 @@ const SignIn = (props: {}) => {
                     aria-hidden="true"
                   />
                 </span>
-                Connect
+                Connect your Stacks wallet
               </button>
             </div>
           </div>

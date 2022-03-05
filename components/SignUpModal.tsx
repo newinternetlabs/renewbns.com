@@ -1,6 +1,6 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { MailIcon, ExclamationCircleIcon } from "@heroicons/react/outline";
+import { MailIcon } from "@heroicons/react/outline";
 
 const SignUpModal = (props: {}) => {
   const [open, setOpen] = useState(true);
