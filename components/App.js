@@ -5,7 +5,7 @@ import { getUserData } from "../utils/auth";
 import Name from "../components/Name";
 import WarningAlertWithLink from "../components/WarningAlertWithLink";
 
-const navigation = [{ name: "Names", href: "/names/", current: true }];
+const navigation = [{ name: "Names", href: "/", current: true }];
 const userNavigation = [{ name: "Sign out", href: "#" }];
 
 function classNames(...classes) {
