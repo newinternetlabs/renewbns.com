@@ -112,7 +112,7 @@ export async function transferName(
     `transferName: namespace: ${namespace} label: ${label} existingOwner: ${ownerAddress} newOwner: ${newOwner}`
   );
 
-  return await contractWriteSponsored(
+  return contractWriteSponsored(
     "name-transfer",
     [
       bufferCVFromString(namespace),

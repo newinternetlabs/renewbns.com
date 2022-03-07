@@ -2,6 +2,7 @@ import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 import { Dialog } from "@headlessui/react";
 import { getStxAddress } from "@stacks/wallet-sdk";
 import { TransactionVersion } from "@stacks/transactions";
+import WarningAlertWithLink from "./WarningAlertWithLink";
 
 export default function NonceAndFeeConfirmation(props) {
   function ownerAddress() {
@@ -34,6 +35,11 @@ export default function NonceAndFeeConfirmation(props) {
             Confirm upgrade
           </Dialog.Title>
           <div className="mt-2">
+            {props.error ? (
+              <WarningAlertWithLink
+                message={`Transaction rejected: ${props.error}`}
+              />
+            ) : null}
             <div className="isolate -space-y-px rounded-md shadow-sm">
               <div className="relative border border-gray-300 rounded-md rounded-b-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
                 <label

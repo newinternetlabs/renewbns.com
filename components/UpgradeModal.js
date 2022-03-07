@@ -25,11 +25,13 @@ export default function UpgradeModal(props) {
   const [ownerNonce, setOwnerNonce] = useState(0);
   const [walletNonce, setWalletNonce] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState(null);
 
   const upgradeName = (event) => {
     event.preventDefault();
     console.log("upgradeName(): owner account");
     console.log(ownerAccount);
+    setError(null);
     transferName(
       props.name,
       props.targetAddress,
@@ -40,10 +42,15 @@ export default function UpgradeModal(props) {
       walletNonce,
       fee
     ).then((txn) => {
-      console.log(`transaction: ${txn.txid}`);
-      props.setTransactionValue(txn.txid);
-      props.setShowModal(false);
-      props.setShowTransactionSentModalValue(true);
+      console.log(txn);
+      if (txn.error) {
+        setError(txn.reason);
+      } else {
+        console.log(`transaction: ${txn.txid}`);
+        props.setTransactionValue(txn.txid);
+        props.setShowModal(false);
+        props.setShowTransactionSentModalValue(true);
+      }
     });
   };
 
@@ -86,6 +93,7 @@ export default function UpgradeModal(props) {
     setFee(DEFAULT_FEE);
     setWalletAccount(null);
     setOwnerAccount(null);
+    setError(null);
   };
 
   const updateSecret = (event) => {
@@ -226,6 +234,8 @@ export default function UpgradeModal(props) {
                   fee={fee}
                   setFee={setFee}
                   upgradeName={upgradeName}
+                  error={error}
+                  setError={error}
                 />
               ) : (
                 <SecretKey

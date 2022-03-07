@@ -140,5 +140,5 @@ export async function contractWriteSponsored(
   */
 
   // disabled for testing
-  //return broadcastTransaction(completedTransaction, NETWORK);
+  return broadcastTransaction(completedTransaction, NETWORK);
 }
