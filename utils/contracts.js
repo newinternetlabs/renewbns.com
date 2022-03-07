@@ -21,7 +21,7 @@ import { userSession } from "./auth";
 import { StacksMainnet } from "@stacks/network";
 
 export const NETWORK = new StacksMainnet();
-export const DEFAULT_FEE = 100000;
+export const DEFAULT_FEE = 100000; // 0.1 STX
 export const CONTRACT_ADDRESS = "SP000000000000000000002Q6VF78";
 export const CONTRACT_NAME = "bns";
 
@@ -76,7 +76,10 @@ export async function contractWriteSponsored(
   postConditions,
   attachment,
   owner,
-  wallet
+  wallet,
+  ownerNonce,
+  walletNonce,
+  fee
 ) {
   const ownerAddress = getStxAddress({
     account: owner,
@@ -88,11 +91,11 @@ export async function contractWriteSponsored(
     transactionVersion: TransactionVersion.Mainnet,
   });
 
-  const nextOwnerNonce = await getNonce(ownerAddress, NETWORK);
-  const nextWalletNonce = await getNonce(walletAddress, NETWORK);
-  console.log(
-    `nextOwnerNonce: ${nextOwnerNonce} - nextWalletNonce: ${nextWalletNonce}`
-  );
+  // const nextOwnerNonce = await getNonce(ownerAddress, NETWORK);
+  // const nextWalletNonce = await getNonce(walletAddress, NETWORK);
+  // console.log(
+  //   `nextOwnerNonce: ${nextOwnerNonce} - nextWalletNonce: ${nextWalletNonce}`
+  // );
 
   console.log("calling makeContractCall()");
 
@@ -100,7 +103,7 @@ export async function contractWriteSponsored(
     stxAddress: ownerAddress,
     senderKey: owner.stxPrivateKey,
     sponsored: true,
-    nonce: new BN(nextOwnerNonce),
+    nonce: new BN(ownerNonce),
     // fee: new BN(100000), // TODO - dynamically set this
     contractAddress: CONTRACT_ADDRESS,
     contractName: CONTRACT_NAME,
@@ -121,9 +124,9 @@ export async function contractWriteSponsored(
 
   const completedTransaction = await sponsorTransaction({
     transaction: tx,
-    fee: new BN(DEFAULT_FEE), // TODO - dynamically set this
+    fee: new BN(fee),
     sponsorPrivateKey: wallet.stxPrivateKey,
-    sponsorNonce: new BN(nextWalletNonce),
+    sponsorNonce: new BN(walletNonce),
   });
 
   console.log(
@@ -136,5 +139,6 @@ export async function contractWriteSponsored(
    {"error":"transaction rejected","reason":"ConflictingNonceInMempool","txid":"aa0c597639baedf120291fbd4a30a3996590b1d79bb60bca011346e6a05390bf"}
   */
 
+  // disabled for testing
   //return broadcastTransaction(completedTransaction, NETWORK);
 }

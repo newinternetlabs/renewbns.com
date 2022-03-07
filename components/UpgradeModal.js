@@ -1,9 +1,12 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
+import { XIcon } from "@heroicons/react/outline";
 import { mnemonicToSeed } from "bip39";
 import { fromBase58, fromSeed } from "bip32";
-import { TransactionVersion } from "@stacks/transactions";
+import { TransactionVersion, getNonce } from "@stacks/transactions";
+import SecretKey from "./SecretKey";
+import NonceAndFeeConfirmation from "./NonceAndFeeConfirmation";
+import { NETWORK, DEFAULT_FEE } from "../utils/contracts";
 import {
   deriveWalletKeys,
   deriveAccount,
@@ -12,11 +15,16 @@ import {
 } from "@stacks/wallet-sdk";
 import { transferName } from "../utils/names";
 
-export default function SecretKeyModal(props) {
+export default function UpgradeModal(props) {
   const [secret, setSecret] = useState("");
   const [validSecret, setValidSecret] = useState(false);
   const [ownerAccount, setOwnerAccount] = useState(null);
   const [walletAccount, setWalletAccount] = useState(null);
+  const [transaction, setTransaction] = useState(null);
+  const [fee, setFee] = useState(DEFAULT_FEE);
+  const [ownerNonce, setOwnerNonce] = useState(0);
+  const [walletNonce, setWalletNonce] = useState(0);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const upgradeName = (event) => {
     event.preventDefault();
@@ -27,13 +35,57 @@ export default function SecretKeyModal(props) {
       props.targetAddress,
       props.zonefileHash,
       ownerAccount,
-      walletAccount
+      walletAccount,
+      ownerNonce,
+      walletNonce,
+      fee
     ).then((txn) => {
       console.log(`transaction: ${txn.txid}`);
       props.setTransactionValue(txn.txid);
       props.setShowModal(false);
       props.setShowTransactionSentModalValue(true);
     });
+  };
+
+  const confirmUpgradeName = (event) => {
+    event.preventDefault();
+    console.debug("confirmUpgradeName()");
+
+    const ownerAddress = getStxAddress({
+      account: ownerAccount,
+      transactionVersion: TransactionVersion.Mainnet,
+    });
+
+    const walletAddress = getStxAddress({
+      account: walletAccount,
+      transactionVersion: TransactionVersion.Mainnet,
+    });
+
+    console.debug(
+      `confirmUpgradeName: walletNonce ${walletNonce} ownerNonce ${ownerNonce}`
+    );
+    getNonce(walletAddress, NETWORK).then((nonce) => {
+      setWalletNonce(`${nonce}`);
+    });
+
+    getNonce(ownerAddress, NETWORK).then((nonce) => {
+      setOwnerNonce(`${nonce}`);
+    });
+
+    setShowConfirm(true);
+  };
+
+  const closeModal = (event) => {
+    event.preventDefault();
+    console.debug("closeModal");
+    props.setShowModal(false);
+    setShowConfirm(false);
+    setSecret("");
+    setOwnerNonce(0);
+    setWalletNonce(0);
+    setFee(DEFAULT_FEE);
+    setWalletAccount(null);
+    setOwnerAccount(null);
   };
 
   const updateSecret = (event) => {
@@ -118,7 +170,7 @@ export default function SecretKeyModal(props) {
       <Dialog
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
-        onClose={props.setShowModal}
+        onClose={() => props.setShowModal(false)}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
@@ -154,67 +206,37 @@ export default function SecretKeyModal(props) {
                 <button
                   type="button"
                   className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={() => props.setShowModal(false)}
+                  onClick={(e) => closeModal(e)}
                 >
-                  <span className="sr-only">Close</span>
+                  <span className="sr-only">Close {walletNonce}</span>
                   <XIcon className="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
-              <div className="sm:flex sm:items-start">
-                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <ExclamationIcon
-                    className="h-6 w-6 text-red-600"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg leading-6 font-medium text-gray-900"
-                  >
-                    Upgrade {props.name}
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      To upgrade this name, you will need to enter the secret
-                      key for your wallet.
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2 mb-2">
-                      This app will generate a transaction to transfer ownership
-                      of the name to the same account that holds your funds in
-                      your Stacks wallet.
-                    </p>
-                    <textarea
-                      rows={4}
-                      name="comment"
-                      id="comment"
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      value={secret}
-                      onChange={updateSecret}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={(e) => {
-                    props.setShowModal(false);
-                    upgradeName(e);
-                  }}
-                  disabled={!validSecret}
-                >
-                  {validSecret ? `Upgrade ${props.name}` : "Invalid Secret"}
-                </button>
-                <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                  onClick={() => props.setShowModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
+
+              {showConfirm ? (
+                <NonceAndFeeConfirmation
+                  ownerNonce={ownerNonce}
+                  setOwnerNonce={setOwnerNonce}
+                  walletNonce={walletNonce}
+                  setWalletNonce={setWalletNonce}
+                  walletAccount={walletAccount}
+                  ownerAccount={ownerAccount}
+                  name={props.name}
+                  closeModal={closeModal}
+                  fee={fee}
+                  setFee={setFee}
+                  upgradeName={upgradeName}
+                />
+              ) : (
+                <SecretKey
+                  name={props.name}
+                  updateSecret={updateSecret}
+                  secret={secret}
+                  validSecret={validSecret}
+                  confirmUpgradeName={confirmUpgradeName}
+                  closeModal={closeModal}
+                />
+              )}
             </div>
           </Transition.Child>
         </div>

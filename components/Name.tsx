@@ -1,6 +1,6 @@
 import { CalendarIcon, KeyIcon } from "@heroicons/react/solid";
 
-import SecretKeyModal from "../components/SecretKeyModal";
+import UpgradeModal from "../components/UpgradeModal";
 import SignUpModal from "../components/SignUpModal";
 import TransactionSentModal from "../components/TransactionSentModal";
 
@@ -25,7 +25,7 @@ const Name = (props: {
 }) => {
   return (
     <li>
-      <SecretKeyModal
+      <UpgradeModal
         showModal={props.showSecretKeyModal}
         setShowModal={props.setShowSecretKeyModal}
         name={props.name}

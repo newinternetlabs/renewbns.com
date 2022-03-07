@@ -88,7 +88,10 @@ export async function transferName(
   newOwner: string,
   zonefileHash: any,
   ownerAccount: any,
-  walletAccount: any
+  walletAccount: any,
+  ownerNonce: number,
+  walletNonce: number,
+  fee: number
 ) {
   let tokens = name.split(".");
   let namespace = tokens[1];
@@ -127,6 +130,9 @@ export async function transferName(
     ],
     null,
     ownerAccount,
-    walletAccount
+    walletAccount,
+    ownerNonce,
+    walletNonce,
+    fee
   );
 }

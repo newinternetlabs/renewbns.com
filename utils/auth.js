@@ -12,6 +12,8 @@ const appConfig = new AppConfig(
 
 console.debug(`appConfig: using stacks node: ${appConfig.coreNode}`);
 
+export var userSession = new UserSession({ appConfig });
+
 export const stacksConnectOptions = {
   appDetails: {
     name: "renewbns.com",
@@ -30,8 +32,6 @@ export const stacksConnectOptions = {
     userSession.gaia = gaia_storage;
   },
 };
-
-export var userSession = new UserSession({ appConfig });
 
 export function authenticate() {
   showConnect({
