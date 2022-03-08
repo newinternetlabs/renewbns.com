@@ -1,7 +1,6 @@
 import { CalendarIcon, KeyIcon } from "@heroicons/react/solid";
 
 import UpgradeModal from "../components/UpgradeModal";
-import SignUpModal from "../components/SignUpModal";
 import TransactionSentModal from "../components/TransactionSentModal";
 
 const Name = (props: {
@@ -13,7 +12,7 @@ const Name = (props: {
   currentBlock: number;
   legacy: boolean;
   price: number;
-  startLegacyRenew: Function;
+  beginLegacyRenew: Function;
   showSecretKeyModal: boolean;
   setShowSecretKeyModal: Function;
   zonefileHash: string;
@@ -22,6 +21,7 @@ const Name = (props: {
   setShowTransactionSentModalValue: Function;
   setTransactionValue: Function;
   beginRenewLegacyName: Function;
+  showNotifyModal: Function;
 }) => {
   return (
     <li>
@@ -36,6 +36,7 @@ const Name = (props: {
           props.setShowTransactionSentModalValue
         }
         setTransactionValue={props.setTransactionValue}
+        setShowNotifyModal={props.setShowNotifyModal}
       />
       <TransactionSentModal
         transaction={props.transaction}

@@ -4,7 +4,8 @@ import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import { getUserData } from "../utils/auth";
 import Name from "../components/Name";
 import NoNames from "../components/NoNames";
-import WarningAlertWithLink from "../components/WarningAlertWithLink";
+import WarningAlertWithSignUp from "../components/WarningAlertWithSignUp";
+import NotifyModal from "../components/NotifyModal";
 
 const navigation = [{ name: "Names", href: "/", current: true }];
 const userNavigation = [{ name: "Sign out", href: "#" }];
@@ -17,6 +18,16 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.listNames = this.listNames.bind(this);
+    this.setShowNotifyModal = this.setShowNotifyModal.bind(this);
+  }
+
+  state = {
+    showNotifyModal: false,
+  };
+
+  setShowNotifyModal(value) {
+    console.debug("setShowNotifyModal");
+    this.setState({ showNotifyModal: value });
   }
 
   listNames(e) {
@@ -29,6 +40,12 @@ class App extends React.Component {
     return (
       <>
         <div className="min-h-full">
+          {this.state.showNotifyModal ? (
+            <NotifyModal
+              setShowNotifyModal={this.setShowNotifyModal}
+              showNotifyModal={this.state.showNotifyModal}
+            />
+          ) : null}
           <Disclosure as="nav" className="bg-white shadow-sm">
             {({ open }) => (
               <>
@@ -191,17 +208,15 @@ class App extends React.Component {
                 <div className="bg-white shadow overflow-hidden sm:rounded-md">
                   <ul role="list" className="divide-y divide-gray-200">
                     {this.props.names.length == 0 ? (
-                      <NoNames />
+                      <NoNames setShowNotifyModal={this.setShowNotifyModal} />
                     ) : (
                       <>
                         {this.props.names.map((name) => (
                           <div key={name.name}>
                             {name.legacy ? (
-                              <WarningAlertWithLink
+                              <WarningAlertWithSignUp
                                 className="pt-4"
-                                message={
-                                  "This is a pre-Stacks 2.0 legacy name. Sign up to be notified when you can update for use with Stacks 2.0 apps."
-                                }
+                                setShowNotifyModal={this.setShowNotifyModal}
                               />
                             ) : null}
 
@@ -233,6 +248,7 @@ class App extends React.Component {
                                 this.props.setTransactionValue
                               }
                               beginLegacyRenew={this.props.beginLegacyRenew}
+                              setShowNotifyModal={this.setShowNotifyModal}
                             />
                           </div>
                         ))}

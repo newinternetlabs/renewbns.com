@@ -223,6 +223,7 @@ export default function UpgradeModal(props) {
                 <TransactionSent
                   transaction={transaction}
                   closeModal={closeModal}
+                  setShowNotifyModal={props.setShowNotifyModal}
                 />
               ) : (
                 <>

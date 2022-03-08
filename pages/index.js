@@ -3,7 +3,6 @@ import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
 import { NETWORK } from "../utils/contracts";
-
 import { userSession, stxAddress } from "../utils/auth";
 
 import {
@@ -68,8 +67,6 @@ class Index extends React.Component {
   setShowTransactionSentModalValue(value) {
     this.setState({ showTransactionSentModal: value });
   }
-
-  show;
 
   renew(e, name, price) {
     e.preventDefault();
