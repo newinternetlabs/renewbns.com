@@ -1,10 +1,4 @@
 {
   "version": 2,
-  "name": "renewbns.com",
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/names"
-    }
-  ]
+  "name": "renewbns.com"
 }
