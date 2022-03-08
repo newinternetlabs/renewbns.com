@@ -115,8 +115,13 @@ class Index extends React.Component {
           legacy = true;
         }
 
+        if (!name) {
+          console.log("no names found");
+          return;
+        }
+
         console.log(`resolveName(${name})`);
-        return resolveName(name).then((result) => {
+        resolveName(name).then((result) => {
           console.log(result);
           fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
             (response) => {

@@ -19,7 +19,7 @@ export default function SecretKey(props) {
             Renew {props.name}
           </Dialog.Title>
           <div className="mt-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-4">
               To renew this name, you will need to enter the secret key for your
               wallet.
             </p>

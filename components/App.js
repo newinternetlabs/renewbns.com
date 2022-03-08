@@ -3,6 +3,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import { getUserData } from "../utils/auth";
 import Name from "../components/Name";
+import NoNames from "../components/NoNames";
 import WarningAlertWithLink from "../components/WarningAlertWithLink";
 
 const navigation = [{ name: "Names", href: "/", current: true }];
@@ -189,45 +190,54 @@ class App extends React.Component {
                 {/* Replace with your content */}
                 <div className="bg-white shadow overflow-hidden sm:rounded-md">
                   <ul role="list" className="divide-y divide-gray-200">
-                    {this.props.names.map((name) => (
-                      <div key={name.name}>
-                        {name.legacy ? (
-                          <WarningAlertWithLink
-                            className="pt-4"
-                            message={
-                              "This is a pre-Stacks 2.0 legacy name. Sign up to be notified when you can update for use with Stacks 2.0 apps."
-                            }
-                          />
-                        ) : null}
-                        <Name
-                          name={name.name}
-                          address={name.address}
-                          walletAddress={this.props.walletAddress}
-                          expiry={parseInt(
-                            name.data["lease-ending-at"].value.value
-                          )}
-                          renew={this.props.renew}
-                          legacy={name.legacy}
-                          currentBlock={this.props.currentBlock}
-                          price={name.price}
-                          startLegacyRenew={this.props.startLegacyRenew}
-                          showSecretKeyModal={this.props.showSecretKeyModal}
-                          setShowSecretKeyModal={
-                            this.props.setShowSecretKeyModal
-                          }
-                          zonefileHash={name.zonefileHash}
-                          showTransactionSentModal={
-                            this.props.showTransactionSentModal
-                          }
-                          setShowTransactionSentModalValue={
-                            this.props.setShowTransactionSentModalValue
-                          }
-                          transaction={this.props.transaction}
-                          setTransactionValue={this.props.setTransactionValue}
-                          beginLegacyRenew={this.props.beginLegacyRenew}
-                        />
-                      </div>
-                    ))}
+                    {this.props.names.length == 0 ? (
+                      <NoNames />
+                    ) : (
+                      <>
+                        {this.props.names.map((name) => (
+                          <div key={name.name}>
+                            {name.legacy ? (
+                              <WarningAlertWithLink
+                                className="pt-4"
+                                message={
+                                  "This is a pre-Stacks 2.0 legacy name. Sign up to be notified when you can update for use with Stacks 2.0 apps."
+                                }
+                              />
+                            ) : null}
+
+                            <Name
+                              name={name.name}
+                              address={name.address}
+                              walletAddress={this.props.walletAddress}
+                              expiry={parseInt(
+                                name.data["lease-ending-at"].value.value
+                              )}
+                              renew={this.props.renew}
+                              legacy={name.legacy}
+                              currentBlock={this.props.currentBlock}
+                              price={name.price}
+                              startLegacyRenew={this.props.startLegacyRenew}
+                              showSecretKeyModal={this.props.showSecretKeyModal}
+                              setShowSecretKeyModal={
+                                this.props.setShowSecretKeyModal
+                              }
+                              zonefileHash={name.zonefileHash}
+                              showTransactionSentModal={
+                                this.props.showTransactionSentModal
+                              }
+                              setShowTransactionSentModalValue={
+                                this.props.setShowTransactionSentModalValue
+                              }
+                              transaction={this.props.transaction}
+                              setTransactionValue={
+                                this.props.setTransactionValue
+                              }
+                              beginLegacyRenew={this.props.beginLegacyRenew}
+                            />
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </ul>
                 </div>
                 {/* /End replace */}

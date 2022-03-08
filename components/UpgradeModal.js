@@ -5,6 +5,7 @@ import { mnemonicToSeed } from "bip39";
 import { fromBase58, fromSeed } from "bip32";
 import { TransactionVersion, getNonce } from "@stacks/transactions";
 import SecretKey from "./SecretKey";
+import TransactionSent from "./TransactionSent";
 import NonceAndFeeConfirmation from "./NonceAndFeeConfirmation";
 import { NETWORK, DEFAULT_FEE } from "../utils/contracts";
 import {
@@ -42,13 +43,11 @@ export default function UpgradeModal(props) {
       fee
     ).then((txn) => {
       console.log(txn);
-      if (txn.error) {
+      if (false && txn.error) {
         setError(txn.reason);
       } else {
         console.log(`transaction: ${txn.txid}`);
-        props.setTransactionValue(txn.txid);
-        props.setShowModal(false);
-        props.setShowTransactionSentModalValue(true);
+        setTransaction(txn.txid);
       }
     });
   };
@@ -93,6 +92,7 @@ export default function UpgradeModal(props) {
     setWalletAccount(null);
     setOwnerAccount(null);
     setError(null);
+    setTransaction(null);
   };
 
   const updateSecret = (event) => {
@@ -219,33 +219,41 @@ export default function UpgradeModal(props) {
                   <XIcon className="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
-
-              {showConfirm ? (
-                <NonceAndFeeConfirmation
-                  ownerNonce={ownerNonce}
-                  setOwnerNonce={setOwnerNonce}
-                  walletNonce={walletNonce}
-                  setWalletNonce={setWalletNonce}
-                  walletAccount={walletAccount}
-                  ownerAccount={ownerAccount}
-                  name={props.name}
+              {transaction ? (
+                <TransactionSent
+                  transaction={transaction}
                   closeModal={closeModal}
-                  fee={fee}
-                  setFee={setFee}
-                  upgradeName={upgradeName}
-                  error={error}
-                  setError={error}
-                  price={props.price}
                 />
               ) : (
-                <SecretKey
-                  name={props.name}
-                  updateSecret={updateSecret}
-                  secret={secret}
-                  validSecret={validSecret}
-                  confirmUpgradeName={confirmUpgradeName}
-                  closeModal={closeModal}
-                />
+                <>
+                  {showConfirm ? (
+                    <NonceAndFeeConfirmation
+                      ownerNonce={ownerNonce}
+                      setOwnerNonce={setOwnerNonce}
+                      walletNonce={walletNonce}
+                      setWalletNonce={setWalletNonce}
+                      walletAccount={walletAccount}
+                      ownerAccount={ownerAccount}
+                      name={props.name}
+                      closeModal={closeModal}
+                      fee={fee}
+                      setFee={setFee}
+                      upgradeName={upgradeName}
+                      error={error}
+                      setError={error}
+                      price={props.price}
+                    />
+                  ) : (
+                    <SecretKey
+                      name={props.name}
+                      updateSecret={updateSecret}
+                      secret={secret}
+                      validSecret={validSecret}
+                      confirmUpgradeName={confirmUpgradeName}
+                      closeModal={closeModal}
+                    />
+                  )}
+                </>
               )}
             </div>
           </Transition.Child>
