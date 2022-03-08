@@ -21,7 +21,7 @@ const Name = (props: {
   setShowTransactionSentModalValue: Function;
   setTransactionValue: Function;
   beginRenewLegacyName: Function;
-  showNotifyModal: Function;
+  setShowNotifyModal: Function;
 }) => {
   return (
     <li>

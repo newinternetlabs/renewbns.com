@@ -71,7 +71,6 @@ export async function renewName(name: string, price: number) {
       noneCV(),
       noneCV(),
     ],
-    null,
     null
   );
 }

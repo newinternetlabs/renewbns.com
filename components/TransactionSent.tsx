@@ -46,6 +46,7 @@ export default function TransactionSent(props: {
           href={`https://explorer.stacks.co/txid/0x${props.transaction}`}
           className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
           target="_blank"
+          rel="noreferrer"
         >
           View transaction
           <ExternalLinkIcon
