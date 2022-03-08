@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
+import { NETWORK } from "../utils/contracts";
 
 import { userSession, stxAddress } from "../utils/auth";
 
@@ -27,13 +28,13 @@ class Index extends React.Component {
     super(props);
     this.handleSignOut = this.handleSignOut.bind(this);
     this.renew = this.renew.bind(this);
-    this.startLegacyRenew = this.startLegacyRenew.bind(this);
     this.setSecretKey = this.setSecretKey.bind(this);
     this.setShowSecretKeyModal = this.setShowSecretKeyModal.bind(this);
     this.upgradeName = this.upgradeName.bind(this);
     this.setShowTransactionSentModalValue =
       this.setShowTransactionSentModalValue.bind(this);
     this.setTransactionValue = this.setTransactionValue.bind(this);
+    this.beginLegacyRenew = this.beginLegacyRenew.bind(this);
   }
   state = {
     userData: null,
@@ -75,7 +76,7 @@ class Index extends React.Component {
     renewName(name, price);
   }
 
-  startLegacyRenew(e, name, price) {
+  beginLegacyRenew(e) {
     e.preventDefault();
     console.log("Start legacy renew");
     this.setState({ secretKey: null, showSecretKeyModal: true });
@@ -117,29 +118,29 @@ class Index extends React.Component {
         console.log(`resolveName(${name})`);
         return resolveName(name).then((result) => {
           console.log(result);
-          fetch(
-            "https://stacks-node-api.mainnet.stacks.co/v2/prices/names/" + name
-          ).then((response) => {
-            return response.json().then((json) => {
-              let price = parseInt(json.amount);
-              let zonefileHash = Buffer.from(
-                result["zonefile-hash"].value.substr(2),
-                "hex"
-              );
-              this.setState({
-                names: [
-                  {
-                    name,
-                    address: result.owner.value,
-                    data: result,
-                    legacy,
-                    price,
-                    zonefileHash,
-                  },
-                ],
+          fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
+            (response) => {
+              return response.json().then((json) => {
+                let price = parseInt(json.amount);
+                let zonefileHash = Buffer.from(
+                  result["zonefile-hash"].value.substr(2),
+                  "hex"
+                );
+                this.setState({
+                  names: [
+                    {
+                      name,
+                      address: result.owner.value,
+                      data: result,
+                      legacy,
+                      price,
+                      zonefileHash,
+                    },
+                  ],
+                });
               });
-            });
-          });
+            }
+          );
         });
       });
 
@@ -158,7 +159,7 @@ class Index extends React.Component {
       <SafeHydrate>
         <div>
           <Head>
-            <title>Renew your BNS names</title>
+            <title>Renew your BNS name</title>
           </Head>
 
           <main>
@@ -184,6 +185,7 @@ class Index extends React.Component {
                 }
                 setTransactionValue={this.setTransactionValue}
                 transaction={this.state.transaction}
+                beginLegacyRenew={this.beginLegacyRenew}
               />
             )}
           </main>

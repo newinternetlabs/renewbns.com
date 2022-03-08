@@ -1,4 +1,4 @@
-import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
+import { RefreshIcon, XIcon } from "@heroicons/react/outline";
 import { Dialog } from "@headlessui/react";
 
 export default function SecretKey(props) {
@@ -8,27 +8,19 @@ export default function SecretKey(props) {
   return (
     <>
       <div className="sm:flex sm:items-start">
-        <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-          <ExclamationIcon
-            className="h-6 w-6 text-red-600"
-            aria-hidden="true"
-          />
+        <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+          <RefreshIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
         </div>
         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
           <Dialog.Title
             as="h3"
             className="text-lg leading-6 font-medium text-gray-900"
           >
-            Upgrade {props.name}
+            Renew {props.name}
           </Dialog.Title>
           <div className="mt-2">
             <p className="text-sm text-gray-500">
-              To upgrade this name, you will need to enter the secret key for
-              your wallet.
-            </p>
-            <p className="text-sm text-gray-500 mt-2 mb-2">
-              This app will generate a transaction to transfer ownership of the
-              name to the same account that holds your funds in your Stacks
+              To renew this name, you will need to enter the secret key for your
               wallet.
             </p>
             <textarea
@@ -57,7 +49,7 @@ export default function SecretKey(props) {
           }}
           disabled={!props.validSecret}
         >
-          {props.validSecret ? `Upgrade ${props.name}` : "Invalid Secret"}
+          {props.validSecret ? `Renew ${props.name}` : "Invalid Secret"}
         </button>
         <button
           type="button"

@@ -76,6 +76,47 @@ export async function renewName(name: string, price: number) {
   );
 }
 
+export async function renewLegacyName(
+  name: string,
+  price: number,
+  ownerAccount: any,
+  walletAccount: any,
+  ownerNonce: number,
+  walletNonce: number,
+  fee: number
+) {
+  let tokens = name.split(".");
+  let namespace = tokens[1];
+  let label = tokens[0];
+
+  let ownerAddress = getStxAddress({
+    account: ownerAccount,
+    transactionVersion: TransactionVersion.Mainnet,
+  });
+
+  console.log(
+    `renewLegacyName: namespace: ${namespace} label: ${label} existingOwner: ${ownerAddress}`
+  );
+
+  return contractWriteSponsored(
+    "name-renewal",
+    [
+      bufferCVFromString(namespace),
+      bufferCVFromString(label),
+      uintCV(price),
+      noneCV(),
+      noneCV(),
+    ],
+    null,
+    null,
+    ownerAccount,
+    walletAccount,
+    ownerNonce,
+    walletNonce,
+    fee
+  );
+}
+
 /*
 (define-public (name-transfer (namespace (buff 20))
 							  (name (buff 48))

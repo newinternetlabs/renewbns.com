@@ -13,7 +13,7 @@ import {
   getStxAddress,
   DerivationType,
 } from "@stacks/wallet-sdk";
-import { transferName } from "../utils/names";
+import { renewLegacyName } from "../utils/names";
 
 export default function UpgradeModal(props) {
   const [secret, setSecret] = useState("");
@@ -32,10 +32,9 @@ export default function UpgradeModal(props) {
     console.log("upgradeName(): owner account");
     console.log(ownerAccount);
     setError(null);
-    transferName(
+    renewLegacyName(
       props.name,
-      props.targetAddress,
-      props.zonefileHash,
+      props.price,
       ownerAccount,
       walletAccount,
       ownerNonce,
@@ -236,6 +235,7 @@ export default function UpgradeModal(props) {
                   upgradeName={upgradeName}
                   error={error}
                   setError={error}
+                  price={props.price}
                 />
               ) : (
                 <SecretKey

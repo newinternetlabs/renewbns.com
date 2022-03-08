@@ -195,7 +195,7 @@ class App extends React.Component {
                           <WarningAlertWithLink
                             className="pt-4"
                             message={
-                              "Your pre-Stacks 2.0 legacy name needs to be upgraded before it can be renewed."
+                              "This is a pre-Stacks 2.0 legacy name. Sign up to be notified when you can update for use with Stacks 2.0 apps."
                             }
                           />
                         ) : null}
@@ -215,7 +215,6 @@ class App extends React.Component {
                           setShowSecretKeyModal={
                             this.props.setShowSecretKeyModal
                           }
-                          upgradeName={this.props.upgradeName}
                           zonefileHash={name.zonefileHash}
                           showTransactionSentModal={
                             this.props.showTransactionSentModal
@@ -225,6 +224,7 @@ class App extends React.Component {
                           }
                           transaction={this.props.transaction}
                           setTransactionValue={this.props.setTransactionValue}
+                          beginLegacyRenew={this.props.beginLegacyRenew}
                         />
                       </div>
                     ))}

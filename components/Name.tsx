@@ -16,12 +16,12 @@ const Name = (props: {
   startLegacyRenew: Function;
   showSecretKeyModal: boolean;
   setShowSecretKeyModal: Function;
-  upgradeName: Function;
   zonefileHash: string;
   showTransactionSentModal: boolean;
   transaction: string;
   setShowTransactionSentModalValue: Function;
   setTransactionValue: Function;
+  beginRenewLegacyName: Function;
 }) => {
   return (
     <li>
@@ -81,18 +81,11 @@ const Name = (props: {
               {props.legacy ? (
                 <div>
                   <button
-                    onClick={(e) =>
-                      props.upgradeName(
-                        e,
-                        props.name,
-                        props.walletAddress,
-                        props.zonefileHash
-                      )
-                    }
+                    onClick={(e) => props.beginLegacyRenew(e)}
                     type="button"
                     className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
-                    Upgrade Legacy Name
+                    Renew now: {props.price / 1000000.0} STX
                   </button>
                 </div>
               ) : (

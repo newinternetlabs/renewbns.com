@@ -18,6 +18,10 @@ export default function NonceAndFeeConfirmation(props) {
       transactionVersion: TransactionVersion.Mainnet,
     });
   }
+
+  function estimatedMinBalance() {
+    return Math.ceil((props.fee + props.price) / 1000000.0 + 0.5);
+  }
   return (
     <>
       <div className="sm:flex sm:items-start">
@@ -32,9 +36,9 @@ export default function NonceAndFeeConfirmation(props) {
             as="h3"
             className="text-lg leading-6 font-medium text-gray-900"
           >
-            Confirm upgrade
+            Confirm renewal of {props.name}
           </Dialog.Title>
-          <div className="mt-2">
+          <div className="mt-4">
             {props.error ? (
               <WarningAlertWithLink
                 message={`Transaction rejected: ${props.error}`}
@@ -77,12 +81,34 @@ export default function NonceAndFeeConfirmation(props) {
                   readOnly
                 />
               </div>
-              <div className="relative border border-gray-300 rounded-md rounded-t-none rounded-b-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
+
+              <div className="relative border border-gray-300 rounded-md rounded-t-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
+                <label
+                  htmlFor="wallet-address"
+                  className="block text-xs font-medium text-gray-900"
+                >
+                  Wallet address
+                </label>
+                <input
+                  type="text"
+                  name="wallet-addressr"
+                  id="wallet-address"
+                  className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
+                  placeholder="Wallet address"
+                  value={walletAddress()}
+                  disabled
+                  readOnly
+                />
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2 mb-2">Advanced settings</p>
+            <div className="isolate -space-y-px rounded-md shadow-sm">
+              <div className="relative border border-gray-300 rounded-md rounded-b-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
                 <label
                   htmlFor="current-owner"
                   className="block text-xs font-medium text-gray-900"
                 >
-                  Current owner nonce
+                  Owner nonce
                 </label>
                 <input
                   type="number"
@@ -95,24 +121,6 @@ export default function NonceAndFeeConfirmation(props) {
                     props.setOwnerNonce(e.target.value);
                   }}
                   min="0"
-                />
-              </div>
-              <div className="relative border border-gray-300 rounded-md rounded-t-none rounded-b-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
-                <label
-                  htmlFor="wallet-address"
-                  className="block text-xs font-medium text-gray-900"
-                >
-                  Wallet & new owner address
-                </label>
-                <input
-                  type="text"
-                  name="wallet-addressr"
-                  id="wallet-address"
-                  className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
-                  placeholder="Wallet address"
-                  value={walletAddress()}
-                  disabled
-                  readOnly
                 />
               </div>
               <div className="relative border border-gray-300 rounded-md rounded-t-none rounded-b-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
@@ -157,9 +165,9 @@ export default function NonceAndFeeConfirmation(props) {
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-2 mb-2">
-              This app will generate a transaction to transfer ownership of the
-              name to the same account that holds your funds in your Stacks
-              wallet.
+              Fees will be paid by the wallet address corresponding to this
+              name. Please ensure you have at least {estimatedMinBalance()} STX
+              in your wallet.
             </p>
           </div>
         </div>
@@ -172,7 +180,7 @@ export default function NonceAndFeeConfirmation(props) {
             props.upgradeName(e);
           }}
         >
-          Confirm upgrade
+          Confirm renewal
         </button>
         <button
           type="button"
