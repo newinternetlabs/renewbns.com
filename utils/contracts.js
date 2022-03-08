@@ -9,8 +9,9 @@ import {
   sponsorTransaction,
   broadcastTransaction,
   TransactionVersion,
-  getNonce,
 } from "@stacks/transactions";
+
+import { stxAddress, stacksConnectOptions } from "../utils/auth";
 
 import { getStxAddress } from "@stacks/wallet-sdk";
 
