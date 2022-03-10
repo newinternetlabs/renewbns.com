@@ -12,6 +12,7 @@ import {
   addressName,
   resolveName,
   renewName,
+  isSubdomain,
 } from "../utils/names";
 /**
   Used to disable server-side rendering on this page
@@ -55,6 +56,7 @@ class Index extends React.Component {
     agreedToTerms: false,
     signInError: null,
     signingIn: false,
+    subdomain: false,
   };
 
   startSignIn() {
@@ -196,6 +198,7 @@ class Index extends React.Component {
                   legacy,
                   price,
                   zonefileHash,
+                  subdomain: isSubdomain(name),
                 },
               ],
             });

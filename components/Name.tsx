@@ -22,6 +22,7 @@ const Name = (props: {
   setTransactionValue: Function;
   beginRenewLegacyName: Function;
   setShowNotifyModal: Function;
+  subdomain: boolean;
 }) => {
   return (
     <li>
@@ -79,24 +80,28 @@ const Name = (props: {
               </p>
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-              {props.legacy ? (
-                <div>
-                  <button
-                    onClick={(e) => props.beginLegacyRenew(e)}
-                    type="button"
-                    className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Renew now: {props.price / 1000000.0} STX
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={(e) => props.renew(e, props.name, props.price)}
-                  type="button"
-                  className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Renew now: {props.price / 1000000.0} STX
-                </button>
+              {props.subdomain ? null : (
+                <>
+                  {props.legacy ? (
+                    <div>
+                      <button
+                        onClick={(e) => props.beginLegacyRenew(e)}
+                        type="button"
+                        className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Renew now: {props.price / 1000000.0} STX
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={(e) => props.renew(e, props.name, props.price)}
+                      type="button"
+                      className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Renew now: {props.price / 1000000.0} STX
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>

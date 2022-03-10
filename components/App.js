@@ -6,6 +6,7 @@ import Name from "../components/Name";
 import SearchModal from "../components/SearchModal";
 import NoNames from "../components/NoNames";
 import WarningAlertWithSignUp from "../components/WarningAlertWithSignUp";
+import WarningAlertWithLink from "../components/WarningAlertWithLink";
 import NotifyModal from "../components/NotifyModal";
 import SignUpHeader from "../components/SignUpHeader";
 
@@ -245,6 +246,12 @@ class App extends React.Component {
                                 setShowNotifyModal={this.setShowNotifyModal}
                               />
                             ) : null}
+                            {name.subdomain ? (
+                              <WarningAlertWithLink
+                                message="Subdomains are not currently supported by this app."
+                                className="pt-4"
+                              />
+                            ) : null}
 
                             <Name
                               name={name.name}
@@ -275,6 +282,7 @@ class App extends React.Component {
                               }
                               beginLegacyRenew={this.props.beginLegacyRenew}
                               setShowNotifyModal={this.setShowNotifyModal}
+                              subdomain={name.subdomain}
                             />
                           </div>
                         ))}
