@@ -2,8 +2,10 @@ import React from "react";
 import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
+import Footer from "../components/Footer";
+import Terms from "../components/Terms";
 import { NETWORK } from "../utils/contracts";
-import { userSession, stxAddress } from "../utils/auth";
+import { userSession, stxAddress, authenticate } from "../utils/auth";
 
 import {
   getCurrentBlock,
@@ -35,6 +37,8 @@ class Index extends React.Component {
     this.setTransactionValue = this.setTransactionValue.bind(this);
     this.beginLegacyRenew = this.beginLegacyRenew.bind(this);
     this.resolveAndAddName = this.resolveAndAddName.bind(this);
+    this.agree = this.agree.bind(this);
+    this.startSignIn = this.startSignIn.bind(this);
   }
   state = {
     userData: null,
@@ -48,12 +52,39 @@ class Index extends React.Component {
     walletAddress: null,
     showTransactionSentModal: false,
     transaction: "",
+    agreedToTerms: false,
+    signInError: null,
+    signingIn: false,
   };
+
+  startSignIn() {
+    const onFinish = () => {
+      console.debug("Stacks Connect onFinish");
+      window.location.reload();
+    };
+
+    const onCancel = () => {
+      console.debug("Stacks Connect onCancel");
+      alert("Authentication was canceled");
+    };
+    this.setState({ signingIn: true });
+    authenticate().catch((error) => {
+      console.error("Stacks Connect error caught");
+      console.error(error);
+      alert(
+        "Stacks Connect encountered an error signing in with your account."
+      );
+    });
+  }
 
   handleSignOut(e) {
     e.preventDefault();
     this.setState({ userData: null });
     userSession.signUserOut(window.location);
+  }
+
+  agree() {
+    this.setState({ agreedToTerms: true });
   }
 
   setShowSecretKeyModal(value) {
@@ -92,14 +123,25 @@ class Index extends React.Component {
   }
 
   componentDidMount() {
-    if (userSession.isSignInPending()) {
+    let isSignInPending = false;
+    try {
+      isSignInPending = userSession.isSignInPending();
+    } catch (error) {
+      console.error("Stacks Connect isSignInPending error");
+      console.error(error);
+    }
+    if (isSignInPending) {
       console.log("isSignInPending");
       userSession.handlePendingSignIn().then((userData) => {
         console.log("handlePendingSignIn");
+        this.setState({ signingIn: false });
+
         window.history.replaceState({}, document.title, "/");
         this.setState({ userData: userData });
       });
     } else if (userSession.isUserSignedIn()) {
+      this.setState({ signingIn: false });
+
       console.log("isUserSignedIn");
       let address = stxAddress();
       console.log(`setting wallet address: ${address}`);
@@ -170,37 +212,47 @@ class Index extends React.Component {
           <Head>
             <title>Renew your BNS name</title>
           </Head>
-
           <main>
             {!userSession.isUserSignedIn() ? (
-              <SignIn />
-            ) : (
-              <App
-                userData={this.state.userData}
-                signOut={this.handleSignOut}
-                names={this.state.names}
-                renew={this.renew}
-                currentBlock={this.state.currentBlock}
-                address={this.state.address}
-                walletAddress={this.state.walletAddress}
-                setSecretKey={this.setSecretKey}
-                startLegacyRenew={this.startLegacyRenew}
-                showSecretKeyModal={this.state.showSecretKeyModal}
-                setShowSecretKeyModal={this.setShowSecretKeyModal}
-                upgradeName={this.upgradeName}
-                showTransactionSentModal={this.state.showTransactionSentModal}
-                setShowTransactionSentModalValue={
-                  this.setShowTransactionSentModalValue
-                }
-                setTransactionValue={this.setTransactionValue}
-                transaction={this.state.transaction}
-                beginLegacyRenew={this.beginLegacyRenew}
-                resolveAndAddName={this.resolveAndAddName}
+              <SignIn
+                startSignIn={this.startSignIn}
+                signingIn={this.state.signingIn}
               />
+            ) : (
+              <>
+                {this.state.agreedToTerms ? (
+                  <App
+                    userData={this.state.userData}
+                    signOut={this.handleSignOut}
+                    names={this.state.names}
+                    renew={this.renew}
+                    currentBlock={this.state.currentBlock}
+                    address={this.state.address}
+                    walletAddress={this.state.walletAddress}
+                    setSecretKey={this.setSecretKey}
+                    startLegacyRenew={this.startLegacyRenew}
+                    showSecretKeyModal={this.state.showSecretKeyModal}
+                    setShowSecretKeyModal={this.setShowSecretKeyModal}
+                    upgradeName={this.upgradeName}
+                    showTransactionSentModal={
+                      this.state.showTransactionSentModal
+                    }
+                    setShowTransactionSentModalValue={
+                      this.setShowTransactionSentModalValue
+                    }
+                    setTransactionValue={this.setTransactionValue}
+                    transaction={this.state.transaction}
+                    beginLegacyRenew={this.beginLegacyRenew}
+                    resolveAndAddName={this.resolveAndAddName}
+                  />
+                ) : (
+                  <Terms agree={this.agree} />
+                )}
+              </>
             )}
           </main>
 
-          <footer></footer>
+          <Footer />
         </div>
       </SafeHydrate>
     );

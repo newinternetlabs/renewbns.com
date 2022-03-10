@@ -7,6 +7,7 @@ import SearchModal from "../components/SearchModal";
 import NoNames from "../components/NoNames";
 import WarningAlertWithSignUp from "../components/WarningAlertWithSignUp";
 import NotifyModal from "../components/NotifyModal";
+import SignUpHeader from "../components/SignUpHeader";
 
 const navigation = [{ name: "Names", href: "/", current: true }];
 const userNavigation = [{ name: "Sign out", href: "#" }];
@@ -48,6 +49,12 @@ class App extends React.Component {
     return (
       <>
         <div className="min-h-full">
+          <SignUpHeader
+            notifyMe={() => {
+              this.setShowNotifyModal(true);
+            }}
+          />
+
           {this.state.showNotifyModal ? (
             <NotifyModal
               setShowNotifyModal={this.setShowNotifyModal}

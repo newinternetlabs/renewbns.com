@@ -17,35 +17,23 @@ export var userSession = new UserSession({ appConfig });
 export const stacksConnectOptions = {
   appDetails: {
     name: "renewbns.com",
-    icon:
-      (process.browser ? document.location.origin : "") +
-      "/images/NIL-n-c-350x350.png",
+    icon: "https://renewbns.com/images/NIL-n-c-350x350.png",
   },
   userSession: userSession,
   onFinish: () => {
-    userSession.user_data = userSession.loadUserData();
-    const token = decodeToken(userSession.user_data.authResponseToken);
-    userSession.user_data.profile_url =
-      token && token.payload && token.payload.profile_url;
-    userSession.signed_in = true;
-    if (!userSession.user_data) userSession.user_data = {};
-    userSession.gaia = gaia_storage;
+    console.debug("Stacks Connect onFinish");
+    window.location.reload();
+  },
+  onCancel: () => {
+    console.debug("Stacks Connect onCancel");
+    alert(
+      "Stacks Connect was unable to authenticate with your wallet. Check the console for more information."
+    );
   },
 };
 
-export function authenticate() {
-  showConnect({
-    appDetails: {
-      name: "BNS Renew",
-      icon: window.location.origin + "/images/NIL-n-c-350x350.png",
-    },
-    redirectTo: "/",
-    onFinish: () => {
-      console.log("Stacks Connect onFinish");
-      window.location.reload();
-    },
-    userSession: userSession,
-  });
+export async function authenticate(onFinish, onCancel) {
+  return showConnect(stacksConnectOptions);
 }
 
 export function getUserData() {
