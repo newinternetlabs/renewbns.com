@@ -14,7 +14,7 @@ import {
   getStxAddress,
   DerivationType,
 } from "@stacks/wallet-sdk";
-import { renewLegacyName } from "../utils/names";
+import { renewLegacyName, ACCOUNT_INDEX_LIMIT } from "../utils/names";
 
 export default function UpgradeModal(props) {
   const [secret, setSecret] = useState("");
@@ -113,12 +113,11 @@ export default function UpgradeModal(props) {
           /**** start loop ****/
 
           let found = false;
-          const indexLimit = 10;
           let i = 0;
           let legacyOwnerAccount = null;
           let walletAccount = null;
           let walletAccountAddress = null;
-          while (!found && i < indexLimit) {
+          while (!found && i < ACCOUNT_INDEX_LIMIT) {
             legacyOwnerAccount = deriveAccount({
               rootNode,
               index: i,

@@ -13,7 +13,11 @@ import {
   DerivationType,
 } from "@stacks/wallet-sdk";
 
-import { renewLegacyName, addressName } from "../utils/names";
+import {
+  renewLegacyName,
+  addressName,
+  ACCOUNT_INDEX_LIMIT,
+} from "../utils/names";
 
 export default function SearchModal(props) {
   const [secret, setSecret] = useState("");
@@ -26,6 +30,7 @@ export default function SearchModal(props) {
   const [walletNonce, setWalletNonce] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState(null);
+  const [nameFound, setNameFound] = useState(false);
 
   const upgradeName = (event) => {
     event.preventDefault();
@@ -117,13 +122,12 @@ export default function SearchModal(props) {
           /**** start loop ****/
 
           let found = false;
-          const indexLimit = 10;
           let i = 0;
           let legacyOwnerAccount = null;
           let legacyOwnerAddress = null;
           let walletAccount = null;
           let walletAccountAddress = null;
-          while (!found && i < indexLimit) {
+          while (!found && i < ACCOUNT_INDEX_LIMIT) {
             legacyOwnerAccount = deriveAccount({
               rootNode,
               index: i,
@@ -164,6 +168,7 @@ export default function SearchModal(props) {
             if (found) {
               addressName(legacyOwnerAddress).then((name) => {
                 console.debug(`Name found: ${name} - ${legacyOwnerAddress}`);
+                setNameFound(true);
                 if (name) {
                   const legacy = true;
                   props.resolveAndAddName(name, legacy);
@@ -269,27 +274,15 @@ export default function SearchModal(props) {
                 </div>
               </div>
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-${validColor(
-                    validSecret
-                  )}-600 text-base font-medium text-white hover:bg-${validColor(
-                    validSecret
-                  )}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${validColor(
-                    validSecret
-                  )}-500 sm:ml-3 sm:w-auto sm:text-sm`}
-                  onClick={(e) => {}}
-                  disabled={!validSecret}
-                >
-                  {validSecret ? `Renew ${props.name}` : "Invalid Secret"}
-                </button>
-                <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                  onClick={() => props.setShowSearchModal(false)}
-                >
-                  Cancel
-                </button>
+                {validSecret ? (
+                  <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Searching...
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                    Invalid secret
+                  </span>
+                )}
               </div>
             </div>
           </Transition.Child>

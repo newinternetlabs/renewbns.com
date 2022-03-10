@@ -23,6 +23,8 @@ import { getStxAddress } from "@stacks/wallet-sdk";
 
 const API_BASE_URL = "https://stacks-node-api.mainnet.stacks.co";
 
+export const ACCOUNT_INDEX_LIMIT = 25;
+
 export async function getCurrentBlock() {
   return fetch(`${API_BASE_URL}/v2/info`).then((response) => {
     return response.json().then((json) => {
