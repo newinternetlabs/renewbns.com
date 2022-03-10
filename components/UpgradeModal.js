@@ -43,7 +43,7 @@ export default function UpgradeModal(props) {
       fee
     ).then((txn) => {
       console.log(txn);
-      if (false && txn.error) {
+      if (txn.error) {
         setError(txn.reason);
       } else {
         console.log(`transaction: ${txn.txid}`);
