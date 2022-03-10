@@ -1,8 +1,9 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import { getUserData } from "../utils/auth";
 import Name from "../components/Name";
+import SearchModal from "../components/SearchModal";
 import NoNames from "../components/NoNames";
 import WarningAlertWithSignUp from "../components/WarningAlertWithSignUp";
 import NotifyModal from "../components/NotifyModal";
@@ -19,15 +20,22 @@ class App extends React.Component {
     super(props);
     this.listNames = this.listNames.bind(this);
     this.setShowNotifyModal = this.setShowNotifyModal.bind(this);
+    this.setShowSearchModal = this.setShowSearchModal.bind(this);
   }
 
   state = {
     showNotifyModal: false,
+    showSearchModal: false,
   };
 
   setShowNotifyModal(value) {
     console.debug("setShowNotifyModal");
     this.setState({ showNotifyModal: value });
+  }
+
+  setShowSearchModal(value) {
+    console.debug(`setShowSearchModal: ${value}`);
+    this.setState({ showSearchModal: value });
   }
 
   listNames(e) {
@@ -208,7 +216,18 @@ class App extends React.Component {
                 <div className="bg-white shadow overflow-hidden sm:rounded-md">
                   <ul role="list" className="divide-y divide-gray-200">
                     {this.props.names.length == 0 ? (
-                      <NoNames setShowNotifyModal={this.setShowNotifyModal} />
+                      <>
+                        <NoNames
+                          setShowNotifyModal={this.setShowNotifyModal}
+                          setShowSearchModal={this.setShowSearchModal}
+                        />
+                        <SearchModal
+                          showModal={this.state.showSearchModal}
+                          setShowModal={this.setShowSearchModal}
+                          targetAddress={this.props.walletAddress}
+                          resolveAndAddName={this.props.resolveAndAddName}
+                        />
+                      </>
                     ) : (
                       <>
                         {this.props.names.map((name) => (

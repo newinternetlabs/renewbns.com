@@ -34,6 +34,7 @@ class Index extends React.Component {
       this.setShowTransactionSentModalValue.bind(this);
     this.setTransactionValue = this.setTransactionValue.bind(this);
     this.beginLegacyRenew = this.beginLegacyRenew.bind(this);
+    this.resolveAndAddName = this.resolveAndAddName.bind(this);
   }
   state = {
     userData: null,
@@ -113,37 +114,14 @@ class Index extends React.Component {
         }
 
         if (!name) {
-          console.log("no names found");
+          console.log(
+            "no names owned by wallet address or legacy names passed by userData.username"
+          );
           return;
         }
 
         console.log(`resolveName(${name})`);
-        resolveName(name).then((result) => {
-          console.log(result);
-          fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
-            (response) => {
-              return response.json().then((json) => {
-                let price = parseInt(json.amount);
-                let zonefileHash = Buffer.from(
-                  result["zonefile-hash"].value.substr(2),
-                  "hex"
-                );
-                this.setState({
-                  names: [
-                    {
-                      name,
-                      address: result.owner.value,
-                      data: result,
-                      legacy,
-                      price,
-                      zonefileHash,
-                    },
-                  ],
-                });
-              });
-            }
-          );
-        });
+        this.resolveAndAddName(name, legacy);
       });
 
       this.setState({ userData: userSession.loadUserData() });
@@ -154,6 +132,35 @@ class Index extends React.Component {
         });
       });
     }
+  }
+
+  resolveAndAddName(name, legacy) {
+    resolveName(name).then((result) => {
+      console.log(result);
+      fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
+        (response) => {
+          return response.json().then((json) => {
+            let price = parseInt(json.amount);
+            let zonefileHash = Buffer.from(
+              result["zonefile-hash"].value.substr(2),
+              "hex"
+            );
+            this.setState({
+              names: [
+                {
+                  name,
+                  address: result.owner.value,
+                  data: result,
+                  legacy,
+                  price,
+                  zonefileHash,
+                },
+              ],
+            });
+          });
+        }
+      );
+    });
   }
 
   render() {
@@ -188,6 +195,7 @@ class Index extends React.Component {
                 setTransactionValue={this.setTransactionValue}
                 transaction={this.state.transaction}
                 beginLegacyRenew={this.beginLegacyRenew}
+                resolveAndAddName={this.resolveAndAddName}
               />
             )}
           </main>
