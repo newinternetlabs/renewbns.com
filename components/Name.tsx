@@ -64,12 +64,15 @@ const Name = (props: {
           </div>
           <div className="mt-2 sm:flex sm:justify-between">
             <div className="sm:flex">
-              <p className="flex items-center text-sm text-gray-500">
+              <p
+                className="flex items-center text-sm text-gray-500"
+                title={`This is the owner address. Do NOT send STX or other digital assets to this address. Only send STX to the address in your wallet. Full owner address: ${props.address}`}
+              >
                 <KeyIcon
-                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400 truncate"
                   aria-hidden="true"
                 />
-                {props.address}
+                {props.address.slice(0, 20)}...
               </p>
               <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                 <CalendarIcon
