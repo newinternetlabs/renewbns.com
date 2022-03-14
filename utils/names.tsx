@@ -26,7 +26,7 @@ const API_BASE_URL = "https://stacks-node-api.mainnet.stacks.co";
 export const ACCOUNT_INDEX_LIMIT = 25;
 
 export function isSubdomain(name: string) {
-  name.split(".").length > 2;
+  return name.split(".").length > 2;
 }
 
 export async function getCurrentBlock() {
@@ -60,7 +60,7 @@ export async function resolveName(name: string) {
     bufferCVFromString(namespace),
     bufferCVFromString(label),
   ]);
-  return result !== 2013 ? result : false;
+  return result !== "2013" ? result : false;
 }
 
 export async function renewName(name: string, price: number) {
