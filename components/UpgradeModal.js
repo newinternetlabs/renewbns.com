@@ -8,6 +8,8 @@ import SecretKey from "./SecretKey";
 import TransactionSent from "./TransactionSent";
 import NonceAndFeeConfirmation from "./NonceAndFeeConfirmation";
 import { NETWORK, DEFAULT_FEE } from "../utils/contracts";
+import { ECPair, payments } from "bitcoinjs-lib";
+
 import {
   deriveWalletKeys,
   deriveAccount,
@@ -125,6 +127,17 @@ export default function UpgradeModal(props) {
               stxDerivationType: DerivationType.Data,
             });
 
+            const keyPair = ECPair.fromPrivateKey(
+              Buffer.from(legacyOwnerAccount.stxPrivateKey.slice(0, 64), "hex")
+            );
+            const { address } = payments.p2pkh({ pubkey: keyPair.publicKey });
+            walletAccount = deriveAccount({
+              rootNode,
+              index: i,
+              salt: derived.salt,
+              stxDerivationType: DerivationType.Wallet,
+            });
+
             walletAccount = deriveAccount({
               rootNode,
               index: i,
@@ -137,7 +150,7 @@ export default function UpgradeModal(props) {
               transactionVersion: TransactionVersion.Mainnet,
             });
             console.log(
-              `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress}`
+              `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress} - stacks 1.0 identity address ${address}`
             );
 
             if (walletAccountAddress == props.targetAddress) {

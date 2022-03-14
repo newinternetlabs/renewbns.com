@@ -6,6 +6,7 @@ import { fromBase58, fromSeed } from "bip32";
 import { TransactionVersion, getNonce } from "@stacks/transactions";
 import SecretKey from "./SecretKey";
 import { NETWORK, DEFAULT_FEE } from "../utils/contracts";
+import { ECPair, payments } from "bitcoinjs-lib";
 import {
   deriveWalletKeys,
   deriveAccount,
@@ -135,6 +136,10 @@ export default function SearchModal(props) {
               stxDerivationType: DerivationType.Data,
             });
 
+            const keyPair = ECPair.fromPrivateKey(
+              Buffer.from(legacyOwnerAccount.stxPrivateKey.slice(0, 64), "hex")
+            );
+            const { address } = payments.p2pkh({ pubkey: keyPair.publicKey });
             walletAccount = deriveAccount({
               rootNode,
               index: i,
@@ -153,7 +158,7 @@ export default function SearchModal(props) {
             });
 
             console.log(
-              `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress}`
+              `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress} - stacks 1.0 identity address ${address}`
             );
 
             if (walletAccountAddress == props.targetAddress) {
