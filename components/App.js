@@ -9,6 +9,7 @@ import WarningAlertWithSignUp from "../components/WarningAlertWithSignUp";
 import WarningAlertWithLink from "../components/WarningAlertWithLink";
 import NotifyModal from "../components/NotifyModal";
 import SignUpHeader from "../components/SignUpHeader";
+import { SearchIcon } from "@heroicons/react/solid";
 
 const navigation = [{ name: "Names", href: "/", current: true }];
 const userNavigation = [{ name: "Sign out", href: "#" }];
@@ -28,6 +29,7 @@ class App extends React.Component {
   state = {
     showNotifyModal: false,
     showSearchModal: false,
+    targetIndex: 0,
   };
 
   setShowNotifyModal(value) {
@@ -229,12 +231,6 @@ class App extends React.Component {
                           setShowNotifyModal={this.setShowNotifyModal}
                           setShowSearchModal={this.setShowSearchModal}
                         />
-                        <SearchModal
-                          showModal={this.state.showSearchModal}
-                          setShowModal={this.setShowSearchModal}
-                          targetAddress={this.props.walletAddress}
-                          resolveAndAddName={this.props.resolveAndAddName}
-                        />
                       </>
                     ) : (
                       <>
@@ -286,8 +282,45 @@ class App extends React.Component {
                             />
                           </div>
                         ))}
+
+                        <div className="text-center mt-8 mb-8">
+                          <div className="mt-6">
+                            <input
+                              type="number"
+                              value={this.state.targetIndex}
+                              onChange={(e) => {
+                                e.preventDefault();
+                                this.setState({
+                                  targetIndex: e.target.valueAsNumber,
+                                });
+                              }}
+                            ></input>
+                          </div>
+                          <div className="mt-6">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                this.setShowSearchModal(true);
+                              }}
+                              type="button"
+                              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                              <SearchIcon
+                                className="-ml-1 mr-2 h-5 w-5"
+                                aria-hidden="true"
+                              />
+                              Search for name by index
+                            </button>
+                          </div>
+                        </div>
                       </>
                     )}
+                    <SearchModal
+                      showModal={this.state.showSearchModal}
+                      setShowModal={this.setShowSearchModal}
+                      resolveAndAddName={this.props.resolveAndAddName}
+                      targetIndex={this.state.targetIndex}
+                    />
                   </ul>
                 </div>
                 {/* /End replace */}

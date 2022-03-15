@@ -115,11 +115,13 @@ export default function UpgradeModal(props) {
           /**** start loop ****/
 
           let found = false;
+          let found2 = false;
           let i = 0;
           let legacyOwnerAccount = null;
+          let legacyOwnerAccountAddress = null;
           let walletAccount = null;
           let walletAccountAddress = null;
-          while (!found && i < ACCOUNT_INDEX_LIMIT) {
+          while ((!found || !found2) && i < ACCOUNT_INDEX_LIMIT) {
             legacyOwnerAccount = deriveAccount({
               rootNode,
               index: i,
@@ -127,17 +129,15 @@ export default function UpgradeModal(props) {
               stxDerivationType: DerivationType.Data,
             });
 
+            legacyOwnerAccountAddress = getStxAddress({
+              account: legacyOwnerAccount,
+              transactionVersion: TransactionVersion.Mainnet,
+            });
+
             const keyPair = ECPair.fromPrivateKey(
               Buffer.from(legacyOwnerAccount.stxPrivateKey.slice(0, 64), "hex")
             );
             const { address } = payments.p2pkh({ pubkey: keyPair.publicKey });
-            walletAccount = deriveAccount({
-              rootNode,
-              index: i,
-              salt: derived.salt,
-              stxDerivationType: DerivationType.Wallet,
-            });
-
             walletAccount = deriveAccount({
               rootNode,
               index: i,
@@ -156,23 +156,29 @@ export default function UpgradeModal(props) {
             if (walletAccountAddress == props.targetAddress) {
               console.log(`Found account index #${i}.`);
               found = true;
+              setWalletAccount(() => {
+                return walletAccount;
+              });
+            }
+            console.log(
+              `index: ${i} - derived address: ${legacyOwnerAccountAddress} - target address: ${props.nameAddress} - stacks 1.0 identity address ${address}`
+            );
+            if (legacyOwnerAccountAddress === props.nameAddress) {
+              found2 = true;
+              setOwnerAccount(() => {
+                return legacyOwnerAccount;
+              });
             }
             i++;
           }
 
           /**** end loop ****/
           setValidSecret(() => {
-            if (found) {
+            if (found && found2) {
               return true;
             } else {
               return false;
             }
-          });
-          setOwnerAccount(() => {
-            return legacyOwnerAccount;
-          });
-          setWalletAccount(() => {
-            return walletAccount;
           });
         });
       })
