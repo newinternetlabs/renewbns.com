@@ -161,7 +161,7 @@ export default function SearchModal(props) {
               `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress} - stacks 1.0 identity address ${address}`
             );
 
-            if (walletAccountAddress == props.targetAddress) {
+            if (walletAccountAddress == props.targetAddress || i === props.targetIndex) {
               console.log(`Found account index #${i}.`);
               found = true;
             }
@@ -176,7 +176,7 @@ export default function SearchModal(props) {
                 setNameFound(true);
                 if (name) {
                   const legacy = true;
-                  props.resolveAndAddName(name, legacy);
+                  props.resolveAndAddName(name, legacy, walletAccountAddress);
                 }
               });
               return true;

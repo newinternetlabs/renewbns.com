@@ -178,33 +178,54 @@ class Index extends React.Component {
     }
   }
 
-  resolveAndAddName(name, legacy) {
+  resolveAndAddName(name, legacy, walletAddress) {
     resolveName(name).then((result) => {
       console.log(result);
-      fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
-        (response) => {
-          return response.json().then((json) => {
-            let price = parseInt(json.amount);
-            let zonefileHash = Buffer.from(
-              result["zonefile-hash"].value.substr(2),
-              "hex"
-            );
-            this.setState({
-              names: [
-                {
-                  name,
-                  address: result.owner.value,
-                  data: result,
-                  legacy,
-                  price,
-                  zonefileHash,
-                  subdomain: isSubdomain(name),
-                },
-              ],
+      const subdomain = isSubdomain(name);
+      if (result) {
+        fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
+          (response) => {
+            return response.json().then((json) => {
+              console.log(json);
+              let price = parseInt(json.amount);
+              let zonefileHash = Buffer.from(
+                result["zonefile-hash"].value.substr(2),
+                "hex"
+              );
+              this.setState({
+                names: [
+                  {
+                    name,
+                    address: result.owner.value,
+                    walletAddress,
+                    data: result,
+                    legacy,
+                    price,
+                    zonefileHash,
+                    subdomain,
+                  },
+                ],
+              });
             });
-          });
-        }
-      );
+          }
+        );
+      } else {
+        this.setState({
+          names: [
+            {
+              name,
+              address: "",
+              data: {
+                "lease-ending-at": { value: { value: "10000000000000" } },
+              },
+              legacy,
+              price: 0,
+              zonefileHash: Buffer.from([0]),
+              subdomain,
+            },
+          ],
+        });
+      }
     });
   }
 

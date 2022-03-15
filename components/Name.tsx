@@ -30,6 +30,7 @@ const Name = (props: {
         showModal={props.showSecretKeyModal}
         setShowModal={props.setShowSecretKeyModal}
         name={props.name}
+        nameAddress={props.address}
         price={props.price}
         targetAddress={props.walletAddress}
         zonefileHash={props.zonefileHash}
