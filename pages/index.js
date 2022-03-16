@@ -40,6 +40,7 @@ class Index extends React.Component {
     this.resolveAndAddName = this.resolveAndAddName.bind(this);
     this.agree = this.agree.bind(this);
     this.startSignIn = this.startSignIn.bind(this);
+    this.setTargetIndex = this.setTargetIndex.bind(this);
   }
   state = {
     userData: null,
@@ -57,6 +58,7 @@ class Index extends React.Component {
     signInError: null,
     signingIn: false,
     subdomain: false,
+    targetIndex: 0,
   };
 
   startSignIn() {
@@ -93,6 +95,11 @@ class Index extends React.Component {
     this.setState({ showSecretKeyModal: value });
   }
 
+  setTargetIndex(value) {
+    console.debug(`setTargetIndex(${value})`);
+    this.setState({ targetIndex: value });
+  }
+
   setTransactionValue(value) {
     console.log(`setTransactionValue(${value})`);
     this.setState({ transaction: value });
@@ -125,57 +132,27 @@ class Index extends React.Component {
   }
 
   componentDidMount() {
-    let isSignInPending = false;
-    try {
-      isSignInPending = userSession.isSignInPending();
-    } catch (error) {
-      console.error("Stacks Connect isSignInPending error");
-      console.error(error);
-    }
-    if (isSignInPending) {
-      console.log("isSignInPending");
-      userSession.handlePendingSignIn().then((userData) => {
-        console.log("handlePendingSignIn");
-        this.setState({ signingIn: false });
-
-        window.history.replaceState({}, document.title, "/");
-        this.setState({ userData: userData });
+    getCurrentBlock().then((currentBlock) => {
+      this.setState({
+        currentBlock,
+        userData: null,
+        names: [],
+        currentBlock: 0,
+        legacy: false,
+        address: "",
+        price: 0,
+        secretKey: null,
+        showSecretKeyModal: false,
+        walletAddress: null,
+        showTransactionSentModal: false,
+        transaction: "",
+        agreedToTerms: false,
+        signInError: null,
+        signingIn: false,
+        subdomain: false,
+        targetIndex: 0,
       });
-    } else if (userSession.isUserSignedIn()) {
-      this.setState({ signingIn: false });
-
-      console.log("isUserSignedIn");
-      let address = stxAddress();
-      console.log(`setting wallet address: ${address}`);
-      this.setState({ address, walletAddress: address });
-      addressName(address).then((name) => {
-        let legacy = false;
-        // try legacy name
-        if (name === false && this.state.userData.username) {
-          name = this.state.userData.username;
-          console.log(`trying legacy name: ${name}`);
-          legacy = true;
-        }
-
-        if (!name) {
-          console.log(
-            "no names owned by wallet address or legacy names passed by userData.username"
-          );
-          return;
-        }
-
-        console.log(`resolveName(${name})`);
-        this.resolveAndAddName(name, legacy);
-      });
-
-      this.setState({ userData: userSession.loadUserData() });
-
-      getCurrentBlock().then((currentBlock) => {
-        this.setState({
-          currentBlock,
-        });
-      });
-    }
+    });
   }
 
   resolveAndAddName(name, legacy) {
@@ -216,7 +193,7 @@ class Index extends React.Component {
             <title>Renew your BNS name</title>
           </Head>
           <main>
-            {!userSession.isUserSignedIn() ? (
+            {false && !userSession.isUserSignedIn() ? (
               <SignIn
                 startSignIn={this.startSignIn}
                 signingIn={this.state.signingIn}
@@ -247,6 +224,8 @@ class Index extends React.Component {
                     transaction={this.state.transaction}
                     beginLegacyRenew={this.beginLegacyRenew}
                     resolveAndAddName={this.resolveAndAddName}
+                    targetIndex={this.state.targetIndex}
+                    setTargetIndex={this.setTargetIndex}
                   />
                 ) : (
                   <Terms agree={this.agree} />

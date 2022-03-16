@@ -117,6 +117,7 @@ export default function UpgradeModal(props) {
           let found = false;
           let i = 0;
           let legacyOwnerAccount = null;
+          let legacyOwnerAddress = null;
           let walletAccount = null;
           let walletAccountAddress = null;
           while (!found && i < ACCOUNT_INDEX_LIMIT) {
@@ -125,6 +126,11 @@ export default function UpgradeModal(props) {
               index: i,
               salt: derived.salt,
               stxDerivationType: DerivationType.Data,
+            });
+
+            legacyOwnerAddress = getStxAddress({
+              account: legacyOwnerAccount,
+              transactionVersion: TransactionVersion.Mainnet,
             });
 
             const keyPair = ECPair.fromPrivateKey(
@@ -153,7 +159,7 @@ export default function UpgradeModal(props) {
               `index: ${i} - derived wallet address: ${walletAccountAddress} - target wallet address: ${props.targetAddress} - stacks 1.0 identity address STX: ${legacyOwnerAddress} BTC: ${address}`
             );
 
-            if (walletAccountAddress == props.targetAddress) {
+            if (i == props.targetIndex) {
               console.log(`Found account index #${i}.`);
               found = true;
             }
@@ -169,7 +175,7 @@ export default function UpgradeModal(props) {
             }
           });
           setOwnerAccount(() => {
-            return legacyOwnerAccount;
+            return walletAccount;
           });
           setWalletAccount(() => {
             return walletAccount;
@@ -255,6 +261,7 @@ export default function UpgradeModal(props) {
                       error={error}
                       setError={error}
                       price={props.price}
+                      targetIndex={props.targetIndex}
                     />
                   ) : (
                     <SecretKey
@@ -264,6 +271,8 @@ export default function UpgradeModal(props) {
                       validSecret={validSecret}
                       confirmUpgradeName={confirmUpgradeName}
                       closeModal={closeModal}
+                      targetIndex={props.targetIndex}
+                      setTargetIndex={props.setTargetIndex}
                     />
                   )}
                 </>

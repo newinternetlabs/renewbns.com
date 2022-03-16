@@ -234,6 +234,8 @@ class App extends React.Component {
                           setShowModal={this.setShowSearchModal}
                           targetAddress={this.props.walletAddress}
                           resolveAndAddName={this.props.resolveAndAddName}
+                          targetIndex={this.props.targetIndex}
+                          setTargetIndex={this.props.setTargetIndex}
                         />
                       </>
                     ) : (
@@ -283,6 +285,8 @@ class App extends React.Component {
                               beginLegacyRenew={this.props.beginLegacyRenew}
                               setShowNotifyModal={this.setShowNotifyModal}
                               subdomain={name.subdomain}
+                              targetIndex={this.props.targetIndex}
+                              setTargetIndex={this.props.setTargetIndex}
                             />
                           </div>
                         ))}

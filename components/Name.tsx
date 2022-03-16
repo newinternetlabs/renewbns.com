@@ -23,6 +23,8 @@ const Name = (props: {
   beginRenewLegacyName: Function;
   setShowNotifyModal: Function;
   subdomain: boolean;
+  targetIndex: number;
+  setTargetIndex: Function;
 }) => {
   return (
     <li>
@@ -38,6 +40,8 @@ const Name = (props: {
         }
         setTransactionValue={props.setTransactionValue}
         setShowNotifyModal={props.setShowNotifyModal}
+        targetIndex={props.targetIndex}
+        setTargetIndex={props.setTargetIndex}
       />
       <TransactionSentModal
         transaction={props.transaction}

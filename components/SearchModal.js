@@ -161,7 +161,7 @@ export default function SearchModal(props) {
               `index: ${i} - derived wallet address: ${walletAccountAddress} - target wallet address: ${props.targetAddress} - stacks 1.0 identity address STX: ${legacyOwnerAddress} BTC: ${address}`
             );
 
-            if (walletAccountAddress == props.targetAddress) {
+            if (i == props.targetIndex) {
               console.log(`Found account index #${i}.`);
               found = true;
             }
@@ -171,8 +171,8 @@ export default function SearchModal(props) {
           /**** end loop ****/
           setValidSecret(() => {
             if (found) {
-              addressName(legacyOwnerAddress).then((name) => {
-                console.debug(`Name found: ${name} - ${legacyOwnerAddress}`);
+              addressName(walletAccountAddress).then((name) => {
+                console.debug(`Name found: ${name} - ${walletAccountAddress}`);
                 setNameFound(true);
                 if (name) {
                   const legacy = true;
@@ -275,6 +275,25 @@ export default function SearchModal(props) {
                       value={secret}
                       onChange={updateSecret}
                     />
+                    <div className="relative border border-gray-300 rounded-md rounded-t-none rounded-b-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
+                      <label
+                        htmlFor="target-index"
+                        className="block text-xs font-medium text-gray-900"
+                      >
+                        Account index
+                      </label>
+                      <input
+                        type="text"
+                        name="target-index"
+                        id="target-index"
+                        className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
+                        placeholder="Enter account index"
+                        value={props.targetIndex}
+                        onChange={(e) => {
+                          props.setTargetIndex(e.target.value);
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
