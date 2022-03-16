@@ -158,7 +158,7 @@ export default function SearchModal(props) {
             });
 
             console.log(
-              `index: ${i} - derived address: ${walletAccountAddress} - target address: ${props.targetAddress} - stacks 1.0 identity address ${address}`
+              `index: ${i} - derived wallet address: ${walletAccountAddress} - target wallet address: ${props.targetAddress} - stacks 1.0 identity address STX: ${legacyOwnerAddress} BTC: ${address}`
             );
 
             if (walletAccountAddress == props.targetAddress) {
