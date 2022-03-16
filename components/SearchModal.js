@@ -171,8 +171,8 @@ export default function SearchModal(props) {
           /**** end loop ****/
           setValidSecret(() => {
             if (found) {
-              addressName(walletAccountAddress).then((name) => {
-                console.debug(`Name found: ${name} - ${walletAccountAddress}`);
+              addressName(legacyOwnerAddress).then((name) => {
+                console.debug(`Name found: ${name} - ${legacyOwnerAddress}`);
                 setNameFound(true);
                 if (name) {
                   const legacy = true;

@@ -175,7 +175,7 @@ export default function UpgradeModal(props) {
             }
           });
           setOwnerAccount(() => {
-            return walletAccount;
+            return legacyOwnerAccount;
           });
           setWalletAccount(() => {
             return walletAccount;
