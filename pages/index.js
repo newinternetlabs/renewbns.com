@@ -13,6 +13,7 @@ import {
   resolveName,
   renewName,
   isSubdomain,
+  fetchZonefile,
 } from "../utils/names";
 /**
   Used to disable server-side rendering on this page
@@ -40,6 +41,7 @@ class Index extends React.Component {
     this.resolveAndAddName = this.resolveAndAddName.bind(this);
     this.agree = this.agree.bind(this);
     this.startSignIn = this.startSignIn.bind(this);
+    this.setLocalZonefile = this.setLocalZonefile.bind(this);
   }
   state = {
     userData: null,
@@ -57,6 +59,7 @@ class Index extends React.Component {
     signInError: null,
     signingIn: false,
     subdomain: false,
+    localZonefile: "",
   };
 
   startSignIn() {
@@ -179,33 +182,46 @@ class Index extends React.Component {
   }
 
   resolveAndAddName(name, legacy) {
-    resolveName(name).then((result) => {
-      console.log(result);
+    resolveName(name).then((resolveResult) => {
+      console.debug("resolveAndAddName: resolveName: ");
+      console.debug(resolveResult);
       fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
         (response) => {
           return response.json().then((json) => {
             let price = parseInt(json.amount);
             let zonefileHash = Buffer.from(
-              result["zonefile-hash"].value.substr(2),
+              resolveResult["zonefile-hash"].value.substr(2),
               "hex"
             );
-            this.setState({
-              names: [
-                {
-                  name,
-                  address: result.owner.value,
-                  data: result,
-                  legacy,
-                  price,
-                  zonefileHash,
-                  subdomain: isSubdomain(name),
-                },
-              ],
+
+            fetchZonefile(name).then((zonefile) => {
+              let nameObject = {
+                name,
+                address: resolveResult.owner.value,
+                data: resolveResult,
+                legacy,
+                price,
+                zonefileHash,
+                zonefile,
+                subdomain: isSubdomain(name),
+              };
+
+              console.debug(nameObject);
+
+              this.setState({
+                localZonefile: zonefile,
+                names: [nameObject],
+              });
             });
           });
         }
       );
     });
+  }
+
+  setLocalZonefile(zonefile) {
+    console.debug("setLocalZonefile:");
+    this.setState({ localZonefile: zonefile });
   }
 
   render() {
@@ -247,6 +263,8 @@ class Index extends React.Component {
                     transaction={this.state.transaction}
                     beginLegacyRenew={this.beginLegacyRenew}
                     resolveAndAddName={this.resolveAndAddName}
+                    setLocalZonefile={this.setLocalZonefile}
+                    localZonefile={this.state.localZonefile}
                   />
                 ) : (
                   <Terms agree={this.agree} />

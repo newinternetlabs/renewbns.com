@@ -63,6 +63,14 @@ export async function resolveName(name: string) {
   return result !== "2013" ? result : false;
 }
 
+export async function fetchZonefile(name: string) {
+  console.log(`fetchZonefile: ${name}`);
+  // https://stacks-node-api.mainnet.stacks.co/v1/names/larry.btc/zonefile
+  let response = await fetch(`${API_BASE_URL}/v1/names/${name}/zonefile`);
+  let json = await response.json();
+  return json["zonefile"];
+}
+
 export async function renewName(name: string, price: number) {
   let tokens = name.split(".");
   let namespace = tokens[1];

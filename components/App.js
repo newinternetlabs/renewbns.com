@@ -270,6 +270,9 @@ class App extends React.Component {
                                 this.props.setShowSecretKeyModal
                               }
                               zonefileHash={name.zonefileHash}
+                              localZonefile={this.props.localZonefile}
+                              setLocalZonefile={this.props.setLocalZonefile}
+                              zonefile={name.zonefile}
                               showTransactionSentModal={
                                 this.props.showTransactionSentModal
                               }

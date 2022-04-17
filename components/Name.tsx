@@ -16,6 +16,9 @@ const Name = (props: {
   showSecretKeyModal: boolean;
   setShowSecretKeyModal: Function;
   zonefileHash: string;
+  zonefile: string;
+  localZonefile: string;
+  setLocalZonefile: Function;
   showTransactionSentModal: boolean;
   transaction: string;
   setShowTransactionSentModalValue: Function;
@@ -106,6 +109,34 @@ const Name = (props: {
                   )}
                 </>
               )}
+            </div>
+          </div>
+          <div className="mt-2 sm:flex sm:justify-between">
+            <div className="sm:flex w-full">
+              {" "}
+              <div className="w-full">
+                <label
+                  htmlFor="comment"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Zone file
+                </label>
+                <div className="mt-1">
+                  <textarea
+                    rows={4}
+                    name="comment"
+                    id="comment"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    value={props.localZonefile}
+                    onChange={(e) => {
+                      props.setLocalZonefile(e.target.value);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+              right
             </div>
           </div>
         </div>
