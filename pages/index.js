@@ -185,15 +185,19 @@ class Index extends React.Component {
         (response) => {
           return response.json().then((json) => {
             let price = parseInt(json.amount);
-            let zonefileHash = Buffer.from(
-              result["zonefile-hash"].value.substr(2),
-              "hex"
-            );
+            let expiry = result["lease-ending-at"]
+              ? result["lease-ending-at"].value
+              : result["expire_block"];
+
+            result["lease-ending-at"] = { value: expiry };
+            let zonefileHash = result["zonefile-hash"]
+              ? Buffer.from(result["zonefile-hash"].value.substr(2), "hex")
+              : Buffer.from(result["zonefile_hash"], "hex");
             this.setState({
               names: [
                 {
                   name,
-                  address: result.owner.value,
+                  address: result.owner ? result.owner.value : result.address,
                   data: result,
                   legacy,
                   price,

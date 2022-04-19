@@ -60,7 +60,19 @@ export async function resolveName(name: string) {
     bufferCVFromString(namespace),
     bufferCVFromString(label),
   ]);
-  return result !== "2013" ? result : false;
+  result = "2009";
+  // ERR_NAME_GRACE_PERIOD 2009
+  if (result === "2009") {
+    console.debug(
+      `resolveName: ${name} is in grace period, trying to load from v1 names api`
+    );
+    let apiResult = await (
+      await fetch(`${API_BASE_URL}/v1/names/${name}`)
+    ).json();
+    return apiResult["error"] !== undefined ? false : apiResult;
+  } else {
+    return result !== "2013" ? result : false;
+  }
 }
 
 export async function renewName(name: string, price: number) {
