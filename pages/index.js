@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import Terms from "../components/Terms";
 import { NETWORK } from "../utils/contracts";
 import { userSession, stxAddress, authenticate } from "../utils/auth";
+import { makeZoneFile, parseZoneFile } from "zone-file";
 
 import {
   getCurrentBlock,
@@ -15,6 +16,7 @@ import {
   isSubdomain,
   fetchZonefile,
   updateName,
+  ZONEFILE_TEMPLATE,
 } from "../utils/names";
 /**
   Used to disable server-side rendering on this page
@@ -197,6 +199,7 @@ class Index extends React.Component {
             );
 
             fetchZonefile(name).then((zonefile) => {
+              let parsedZonefile = parseZoneFile(zonefile);
               let nameObject = {
                 name,
                 address: resolveResult.owner.value,
@@ -204,14 +207,15 @@ class Index extends React.Component {
                 legacy,
                 price,
                 zonefileHash,
-                zonefile,
+                zonefileRaw: zonefile,
+                zonefile: parsedZonefile,
                 subdomain: isSubdomain(name),
               };
 
               console.debug(nameObject);
 
               this.setState({
-                localZonefile: zonefile,
+                localZonefile: makeZoneFile(parsedZonefile, ZONEFILE_TEMPLATE),
                 names: [nameObject],
               });
             });
@@ -223,7 +227,9 @@ class Index extends React.Component {
 
   setLocalZonefile(zonefile) {
     console.debug("setLocalZonefile:");
-    this.setState({ localZonefile: zonefile });
+    this.setState({
+      localZonefile: makeZoneFile(parseZoneFile(zonefile), ZONEFILE_TEMPLATE),
+    });
   }
 
   publishZonefile(name, zonefile) {

@@ -19,10 +19,13 @@ import {
   TransactionVersion,
   hash160,
 } from "@stacks/transactions";
+import { makeZoneFile, parseZoneFile } from "zone-file";
 
 import { getStxAddress } from "@stacks/wallet-sdk";
 
 const API_BASE_URL = "https://stacks-node-api.mainnet.stacks.co";
+export const ZONEFILE_TEMPLATE =
+  "{$origin}\n{$ttl}\n{uri}\n{a}\n{aaaa}\n{cname}\n{mx}\n{srv}\n{txt}\n";
 
 export const ACCOUNT_INDEX_LIMIT = 25;
 
