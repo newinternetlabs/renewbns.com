@@ -171,14 +171,14 @@ export default function SearchModal(props) {
           /**** end loop ****/
           setValidSecret(() => {
             if (found) {
-              addressName(legacyOwnerAddress).then((name) => {
-                console.debug(`Name found: ${name} - ${legacyOwnerAddress}`);
-                setNameFound(true);
-                if (name) {
-                  const legacy = true;
-                  props.resolveAndAddName(name, legacy);
-                }
-              });
+              let name = prompt("Please enter the full name:");
+              console.debug(`Name found: ${name} - ${legacyOwnerAddress}`);
+              setNameFound(true);
+              if (name) {
+                const legacy = true;
+                props.resolveAndAddName(name, legacy);
+              }
+
               return true;
             } else {
               return false;
