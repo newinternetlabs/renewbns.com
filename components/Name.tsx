@@ -26,6 +26,7 @@ const Name = (props: {
   beginRenewLegacyName: Function;
   setShowNotifyModal: Function;
   subdomain: boolean;
+  publishZonefile: Function;
 }) => {
   return (
     <li>
@@ -136,7 +137,15 @@ const Name = (props: {
               </div>
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-              right
+              <button
+                onClick={(e) =>
+                  props.publishZonefile(props.name, props.localZonefile)
+                }
+                type="button"
+                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Publish zonefile
+              </button>
             </div>
           </div>
         </div>

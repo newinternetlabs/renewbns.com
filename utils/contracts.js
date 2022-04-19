@@ -41,7 +41,7 @@ export async function contractRead(func, args) {
   ).value.value;
 }
 
-export async function contractWrite(func, args, postConditions) {
+export async function contractWrite(func, args, postConditions, attachment) {
   let address = stxAddress();
   if (!address) throw Error("Not signed in");
   if (!Array.isArray(postConditions))
@@ -64,7 +64,7 @@ export async function contractWrite(func, args, postConditions) {
       network: NETWORK,
       anchorMode: AnchorMode.Any,
       postConditions: postConditions,
-      attachment: undefined,
+      attachment: attachment,
       appDetails: stacksConnectOptions.appDetails,
       onFinish: resolve,
     });

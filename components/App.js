@@ -286,6 +286,7 @@ class App extends React.Component {
                               beginLegacyRenew={this.props.beginLegacyRenew}
                               setShowNotifyModal={this.setShowNotifyModal}
                               subdomain={name.subdomain}
+                              publishZonefile={this.props.publishZonefile}
                             />
                           </div>
                         ))}

@@ -14,6 +14,7 @@ import {
   renewName,
   isSubdomain,
   fetchZonefile,
+  updateName,
 } from "../utils/names";
 /**
   Used to disable server-side rendering on this page
@@ -42,6 +43,7 @@ class Index extends React.Component {
     this.agree = this.agree.bind(this);
     this.startSignIn = this.startSignIn.bind(this);
     this.setLocalZonefile = this.setLocalZonefile.bind(this);
+    this.publishZonefile = this.publishZonefile.bind(this);
   }
   state = {
     userData: null,
@@ -224,6 +226,10 @@ class Index extends React.Component {
     this.setState({ localZonefile: zonefile });
   }
 
+  publishZonefile(name, zonefile) {
+    console.debug("publishZonefile");
+    updateName(name, zonefile);
+  }
   render() {
     return (
       <SafeHydrate>
@@ -265,6 +271,7 @@ class Index extends React.Component {
                     resolveAndAddName={this.resolveAndAddName}
                     setLocalZonefile={this.setLocalZonefile}
                     localZonefile={this.state.localZonefile}
+                    publishZonefile={this.publishZonefile}
                   />
                 ) : (
                   <Terms agree={this.agree} />

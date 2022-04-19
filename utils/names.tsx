@@ -17,6 +17,7 @@ import {
   tupleCV,
   createAssetInfo,
   TransactionVersion,
+  hash160,
 } from "@stacks/transactions";
 
 import { getStxAddress } from "@stacks/wallet-sdk";
@@ -86,6 +87,26 @@ export async function renewName(name: string, price: number) {
       noneCV(),
     ],
     null
+  );
+}
+
+export async function updateName(name: string, zonefile: string) {
+  let tokens = name.split(".");
+  let namespace = tokens[1];
+  let label = tokens[0];
+  let zonefileHash = hash160(Buffer.from(zonefile));
+  console.debug(
+    `updateName: namespace: ${namespace} label: ${label} zonefileHash: ${zonefileHash}`
+  );
+  return await contractWrite(
+    "name-update",
+    [
+      bufferCVFromString(namespace),
+      bufferCVFromString(label),
+      bufferCV(zonefileHash),
+    ],
+    null,
+    zonefile
   );
 }
 
