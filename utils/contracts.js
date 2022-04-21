@@ -64,7 +64,9 @@ export async function contractWrite(func, args, postConditions, attachment) {
       network: NETWORK,
       anchorMode: AnchorMode.Any,
       postConditions: postConditions,
-      attachment: attachment,
+      attachment: attachment
+        ? Buffer.from(attachment, "binary").toString("hex")
+        : undefined,
       appDetails: stacksConnectOptions.appDetails,
       onFinish: resolve,
     });

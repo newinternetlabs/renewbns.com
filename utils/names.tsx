@@ -93,14 +93,14 @@ export async function renewName(name: string, price: number) {
   );
 }
 
-export async function updateName(name: string, zonefile: string) {
+export async function updateName(name: string, zonefile: any) {
+  console.debug(`updateName: ${name}`);
+  console.debug(zonefile);
   let tokens = name.split(".");
   let namespace = tokens[1];
   let label = tokens[0];
   let zonefileHash = hash160(Buffer.from(zonefile));
-  console.debug(
-    `updateName: namespace: ${namespace} label: ${label} zonefileHash: ${zonefileHash}`
-  );
+  console.debug(`updateName: namespace: ${namespace} label: ${label}`);
   return await contractWrite(
     "name-update",
     [
