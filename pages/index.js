@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import SignIn from "../components/SignIn";
 import App from "../components/App";
 import Footer from "../components/Footer";
 import Terms from "../components/Terms";
 import { NETWORK } from "../utils/contracts";
-import { userSession, stxAddress, authenticate } from "../utils/auth";
+import { useAuth, useAccount } from "@micro-stacks/react";
+import { withMicroStacksClientProviderHOC } from "../components/withMicroStacksClientProviderHOC";
 
 import {
   getCurrentBlock,
@@ -25,41 +26,34 @@ function SafeHydrate({ children }) {
   );
 }
 
-class Index extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleSignOut = this.handleSignOut.bind(this);
-    this.renew = this.renew.bind(this);
-    this.setSecretKey = this.setSecretKey.bind(this);
-    this.setShowSecretKeyModal = this.setShowSecretKeyModal.bind(this);
-    this.upgradeName = this.upgradeName.bind(this);
-    this.setShowTransactionSentModalValue =
-      this.setShowTransactionSentModalValue.bind(this);
-    this.setTransactionValue = this.setTransactionValue.bind(this);
-    this.beginLegacyRenew = this.beginLegacyRenew.bind(this);
-    this.resolveAndAddName = this.resolveAndAddName.bind(this);
-    this.agree = this.agree.bind(this);
-    this.startSignIn = this.startSignIn.bind(this);
-  }
-  state = {
-    userData: null,
-    names: [],
-    currentBlock: 0,
-    legacy: false,
-    address: "",
-    price: 0,
-    secretKey: null,
-    showSecretKeyModal: false,
-    walletAddress: null,
-    showTransactionSentModal: false,
-    transaction: "",
-    agreedToTerms: false,
-    signInError: null,
-    signingIn: false,
-    subdomain: false,
-  };
+const Index = (props) => {
+  const {
+    appPrivateKey,
+    stxAddress,
+    rawAddress,
+    identityAddress,
+    decentralizedID,
+    profileUrl,
+  } = useAccount();
 
-  startSignIn() {
+  const { openAuthRequest, isRequestPending, signOut, isSignedIn } = useAuth();
+  const [names, setNames] = useState([]);
+  const [currentBlock, setCurrentBlock] = useState(0);
+  const [legacy, setLegacy] = useState(false);
+  const [address, setAddress] = useState("");
+  const [price, setPrice] = useState(0);
+  const [secretKey, setSecretKey] = useState(null);
+  const [showSecretKeyModal, setShowSecretKeyModal] = useState(false);
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [showTransactionSentModal, setShowTransactionSentModal] =
+    useState(false);
+  const [transaction, setTransaction] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [signInError, setSignInError] = useState(null);
+  const [signingIn, setSigningIn] = useState(false);
+  const [subdomain, setSubdomain] = useState(false);
+
+  const startSignIn = () => {
     const onFinish = () => {
       console.debug("Stacks Connect onFinish");
       window.location.reload();
@@ -69,116 +63,38 @@ class Index extends React.Component {
       console.debug("Stacks Connect onCancel");
       alert("Authentication was canceled");
     };
-    this.setState({ signingIn: true });
-    authenticate().catch((error) => {
-      console.error("Stacks Connect error caught");
-      console.error(error);
-      alert(
-        "Stacks Connect encountered an error signing in with your account."
-      );
-    });
-  }
+    setSigningIn(true);
+    openAuthRequest();
+  };
 
-  handleSignOut(e) {
+  const handleSignOut = (e) => {
     e.preventDefault();
-    this.setState({ userData: null });
-    userSession.signUserOut(window.location);
-  }
+    setUserData(null);
+    signOut();
+  };
 
-  agree() {
-    this.setState({ agreedToTerms: true });
-  }
+  const agree = () => {
+    setAgreedToTerms(true);
+  };
 
-  setShowSecretKeyModal(value) {
-    this.setState({ showSecretKeyModal: value });
-  }
-
-  setTransactionValue(value) {
-    console.log(`setTransactionValue(${value})`);
-    this.setState({ transaction: value });
-  }
-
-  setShowTransactionSentModalValue(value) {
-    this.setState({ showTransactionSentModal: value });
-  }
-
-  renew(e, name, price) {
+  const renew = (e, name, price) => {
     e.preventDefault();
     renewName(name, price);
-  }
+  };
 
-  beginLegacyRenew(e) {
+  const beginLegacyRenew = (e) => {
     e.preventDefault();
     console.log("Start legacy renew");
     this.setState({ secretKey: null, showSecretKeyModal: true });
-  }
+  };
 
-  upgradeName(e, name, walletAddress, zonefileHash) {
+  const upgradeName = (e, name, walletAddress, zonefileHash) => {
     e.preventDefault();
     console.log("Upgrade name");
     this.setState({ secretKey: null, showSecretKeyModal: true });
-  }
+  };
 
-  setSecretKey(e, secretKey) {
-    e.preventDefault();
-    console.log(secretKey);
-  }
-
-  componentDidMount() {
-    let isSignInPending = false;
-    try {
-      isSignInPending = userSession.isSignInPending();
-    } catch (error) {
-      console.error("Stacks Connect isSignInPending error");
-      console.error(error);
-    }
-    if (isSignInPending) {
-      console.log("isSignInPending");
-      userSession.handlePendingSignIn().then((userData) => {
-        console.log("handlePendingSignIn");
-        this.setState({ signingIn: false });
-
-        window.history.replaceState({}, document.title, "/");
-        this.setState({ userData: userData });
-      });
-    } else if (userSession.isUserSignedIn()) {
-      this.setState({ signingIn: false });
-
-      console.log("isUserSignedIn");
-      let address = stxAddress();
-      console.log(`setting wallet address: ${address}`);
-      this.setState({ address, walletAddress: address });
-      addressName(address).then((name) => {
-        let legacy = false;
-        // try legacy name
-        if (name === false && this.state.userData.username) {
-          name = this.state.userData.username;
-          console.log(`trying legacy name: ${name}`);
-          legacy = true;
-        }
-
-        if (!name) {
-          console.log(
-            "no names owned by wallet address or legacy names passed by userData.username"
-          );
-          return;
-        }
-
-        console.log(`resolveName(${name})`);
-        this.resolveAndAddName(name, legacy);
-      });
-
-      this.setState({ userData: userSession.loadUserData() });
-
-      getCurrentBlock().then((currentBlock) => {
-        this.setState({
-          currentBlock,
-        });
-      });
-    }
-  }
-
-  resolveAndAddName(name, legacy) {
+  const resolveAndAddName = (name, legacy) => {
     resolveName(name).then((result) => {
       console.log(result);
       fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
@@ -206,60 +122,90 @@ class Index extends React.Component {
         }
       );
     });
-  }
+  };
 
-  render() {
-    return (
-      <SafeHydrate>
-        <div>
-          <Head>
-            <title>Renew your BNS name</title>
-          </Head>
-          <main>
-            {!userSession.isUserSignedIn() ? (
-              <SignIn
-                startSignIn={this.startSignIn}
-                signingIn={this.state.signingIn}
-              />
-            ) : (
-              <>
-                {this.state.agreedToTerms ? (
-                  <App
-                    userData={this.state.userData}
-                    signOut={this.handleSignOut}
-                    names={this.state.names}
-                    renew={this.renew}
-                    currentBlock={this.state.currentBlock}
-                    address={this.state.address}
-                    walletAddress={this.state.walletAddress}
-                    setSecretKey={this.setSecretKey}
-                    startLegacyRenew={this.startLegacyRenew}
-                    showSecretKeyModal={this.state.showSecretKeyModal}
-                    setShowSecretKeyModal={this.setShowSecretKeyModal}
-                    upgradeName={this.upgradeName}
-                    showTransactionSentModal={
-                      this.state.showTransactionSentModal
-                    }
-                    setShowTransactionSentModalValue={
-                      this.setShowTransactionSentModalValue
-                    }
-                    setTransactionValue={this.setTransactionValue}
-                    transaction={this.state.transaction}
-                    beginLegacyRenew={this.beginLegacyRenew}
-                    resolveAndAddName={this.resolveAndAddName}
-                  />
-                ) : (
-                  <Terms agree={this.agree} />
-                )}
-              </>
-            )}
-          </main>
+  useEffect(() => {
+    console.log("componentDidMount (effect)");
+    if (isSignedIn) {
+      setSigningIn(false);
+      console.log("isUserSignedIn");
+      let address = stxAddress();
+      console.log(`setting wallet address: ${address}`);
+      setAddress(address);
+      setWalletAddress(address);
+      addressName(address).then((name) => {
+        let legacy = false;
+        // try legacy name
+        if (name === false && userData.username) {
+          name = userData.username;
+          console.log(`trying legacy name: ${name}`);
+          legacy = true;
+        }
 
-          <Footer />
-        </div>
-      </SafeHydrate>
-    );
-  }
-}
+        if (!name) {
+          console.log(
+            "no names owned by wallet address or legacy names passed by userData.username"
+          );
+          return;
+        }
 
-export default Index;
+        console.log(`resolveName(${name})`);
+        resolveAndAddName(name, legacy);
+      });
+
+      this.setState({ userData: userSession.loadUserData() });
+
+      getCurrentBlock().then((currentBlock) => {
+        setCurrentBlock(currentBlock);
+      });
+    }
+  }, []);
+
+  return (
+    <SafeHydrate>
+      <div>
+        <Head>
+          <title>Renew your BNS name</title>
+        </Head>
+        <main>
+          {!isSignedIn ? (
+            <SignIn startSignIn={startSignIn} signingIn={signingIn} />
+          ) : (
+            <>
+              {agreedToTerms ? (
+                <App
+                  userData={userData}
+                  signOut={handleSignOut}
+                  names={names}
+                  renew={renew}
+                  currentBlock={currentBlock}
+                  address={address}
+                  walletAddress={walletAddress}
+                  setSecretKey={setSecretKey}
+                  startLegacyRenew={startLegacyRenew}
+                  showSecretKeyModal={showSecretKeyModal}
+                  setShowSecretKeyModal={setShowSecretKeyModal}
+                  upgradeName={upgradeName}
+                  showTransactionSentModal={showTransactionSentModal}
+                  setShowTransactionSentModalValue={
+                    setShowTransactionSentModalValue
+                  }
+                  setTransactionValue={setTransactionValue}
+                  transaction={transaction}
+                  beginLegacyRenew={beginLegacyRenew}
+                  resolveAndAddName={resolveAndAddName}
+                />
+              ) : (
+                <Terms agree={agree} />
+              )}
+            </>
+          )}
+        </main>
+
+        <Footer />
+      </div>
+    </SafeHydrate>
+  );
+};
+
+export default withMicroStacksClientProviderHOC(Index);

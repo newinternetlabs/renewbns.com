@@ -1,6 +1,12 @@
 import { AppConfig, UserSession, showConnect } from "@stacks/connect-react";
 import { Person } from "@stacks/profile";
 import { NETWORK } from "./contracts";
+import { createClient } from "@micro-stacks/client";
+
+export const stacksClient = createClient({
+  appName: "renewbns.com",
+  appIconUrl: "https://renewbns.com/images/NIL-n-c-350x350.png",
+});
 
 const appConfig = new AppConfig(
   [],
@@ -33,7 +39,7 @@ export const stacksConnectOptions = {
 };
 
 export async function authenticate(onFinish, onCancel) {
-  return showConnect(stacksConnectOptions);
+  if (!stacksClient.hasSession) await stacksClient.authenticate();
 }
 
 export function getUserData() {
