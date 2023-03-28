@@ -24,8 +24,12 @@ export default function TransactionSent(props: {
             Transaction sent
           </Dialog.Title>
           <div className="mt-4 text-sm text-gray-500">
-            The network is processing your renewal. Refresh the page after the
-            transaction confirms to see your new expiration date.
+            The network is processing your transaction. Refresh the page after
+            the transaction confirms to see your new expiration date.
+          </div>
+          <div className="mt-4 text-sm text-gray-500">
+            If you are upgrading your Stacks 1.0 name, it should appear after
+            the upgrade transaction confirms.
           </div>
         </div>
       </div>

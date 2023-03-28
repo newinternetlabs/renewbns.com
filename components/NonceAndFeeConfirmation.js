@@ -36,7 +36,7 @@ export default function NonceAndFeeConfirmation(props) {
             as="h3"
             className="text-lg leading-6 font-medium text-gray-900"
           >
-            Confirm renewal of {props.name}
+            Confirm upgrade of {props.name}
           </Dialog.Title>
           <div className="mt-4">
             {props.error ? (
@@ -81,7 +81,24 @@ export default function NonceAndFeeConfirmation(props) {
                   readOnly
                 />
               </div>
-
+              <div className="relative border border-gray-300 rounded-md rounded-t-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
+                <label
+                  htmlFor="wallet-address"
+                  className="block text-xs font-medium text-gray-900"
+                >
+                  New owner
+                </label>
+                <input
+                  type="text"
+                  name="new-owner-address"
+                  id="new-owner-address"
+                  className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
+                  placeholder="New owner address"
+                  value={walletAddress()}
+                  disabled
+                  readOnly
+                />
+              </div>
               <div className="relative border border-gray-300 rounded-md rounded-t-none px-3 py-2 focus-within:z-10 focus-within:ring-1 focus-within:ring-indigo-600 focus-within:border-indigo-600">
                 <label
                   htmlFor="wallet-address"
@@ -180,7 +197,7 @@ export default function NonceAndFeeConfirmation(props) {
             props.upgradeName(e);
           }}
         >
-          Confirm renewal
+          Confirm upgrade
         </button>
         <button
           type="button"

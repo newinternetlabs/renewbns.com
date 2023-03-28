@@ -17,6 +17,7 @@ import {
 import {
   renewLegacyName,
   addressName,
+  transferName,
   ACCOUNT_INDEX_LIMIT,
 } from "../utils/names";
 
@@ -38,12 +39,14 @@ export default function SearchModal(props) {
     console.log("upgradeName(): owner account");
     console.log(ownerAccount);
     setError(null);
-    renewLegacyName(
+
+    transferName(
       props.name,
-      props.price,
+      props.walletAddress,
+      null,
       ownerAccount,
-      walletAccount,
       ownerNonce,
+      walletAccount,
       walletNonce,
       fee
     ).then((txn) => {

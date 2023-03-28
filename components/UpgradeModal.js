@@ -16,7 +16,7 @@ import {
   getStxAddress,
   DerivationType,
 } from "@stacks/wallet-sdk";
-import { renewLegacyName, ACCOUNT_INDEX_LIMIT } from "../utils/names";
+import { transferName, ACCOUNT_INDEX_LIMIT } from "../utils/names";
 
 export default function UpgradeModal(props) {
   const [secret, setSecret] = useState("");
@@ -34,18 +34,24 @@ export default function UpgradeModal(props) {
     event.preventDefault();
     console.log("upgradeName(): owner account");
     console.log(ownerAccount);
+    const newOwnerAddress = getStxAddress({
+      account: walletAccount,
+      transactionVersion: TransactionVersion.Mainnet,
+    });
+
     setError(null);
-    renewLegacyName(
+    transferName(
       props.name,
-      props.price,
+      newOwnerAddress,
+      null,
       ownerAccount,
-      walletAccount,
       ownerNonce,
+      walletAccount,
       walletNonce,
       fee
     ).then((txn) => {
       console.log(txn);
-      if (txn.error) {
+      if (false && txn.error) {
         setError(txn.reason);
       } else {
         console.log(`transaction: ${txn.txid}`);

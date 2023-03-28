@@ -140,6 +140,6 @@ export async function contractWriteSponsored(
    {"error":"transaction rejected","reason":"ConflictingNonceInMempool","txid":"aa0c597639baedf120291fbd4a30a3996590b1d79bb60bca011346e6a05390bf"}
   */
 
-  // disabled for testing
+  // disable for testing
   return broadcastTransaction(completedTransaction, NETWORK);
 }
