@@ -23,7 +23,7 @@ import { getStxAddress } from "@stacks/wallet-sdk";
 
 const API_BASE_URL = "https://stacks-node-api.mainnet.stacks.co";
 
-export const ACCOUNT_INDEX_LIMIT = 25;
+export const ACCOUNT_INDEX_LIMIT = 100;
 
 export function isSubdomain(name: string) {
   return name.split(".").length > 2;
