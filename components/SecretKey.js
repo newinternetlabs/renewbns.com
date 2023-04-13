@@ -16,12 +16,12 @@ export default function SecretKey(props) {
             as="h3"
             className="text-lg leading-6 font-medium text-gray-900"
           >
-            Renew {props.name}
+            Upgrade {props.name}
           </Dialog.Title>
           <div className="mt-2">
             <p className="text-sm text-gray-500 mb-4">
-              To renew this name, you will need to enter the secret key for your
-              wallet.
+              To upgrade this Stacks 1.0 name you will need to enter the secret
+              key for your wallet.
             </p>
             <textarea
               rows={4}
@@ -43,7 +43,7 @@ export default function SecretKey(props) {
               props.confirmUpgradeName(e);
             }}
           >
-            {`Renew ${props.name}`}
+            {`Upgrade ${props.name}`}
           </button>
         ) : (
           <button

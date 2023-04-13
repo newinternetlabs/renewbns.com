@@ -23,7 +23,7 @@ import { getStxAddress } from "@stacks/wallet-sdk";
 
 const API_BASE_URL = "https://stacks-node-api.mainnet.stacks.co";
 
-export const ACCOUNT_INDEX_LIMIT = 25;
+export const ACCOUNT_INDEX_LIMIT = 250;
 
 export function isSubdomain(name: string) {
   return name.split(".").length > 2;
@@ -134,8 +134,8 @@ export async function transferName(
   newOwner: string,
   zonefileHash: any,
   ownerAccount: any,
-  walletAccount: any,
   ownerNonce: number,
+  walletAccount: any,
   walletNonce: number,
   fee: number
 ) {
@@ -155,8 +155,10 @@ export async function transferName(
   let asset = createAssetInfo(CONTRACT_ADDRESS, CONTRACT_NAME, "names");
 
   console.log(
-    `transferName: namespace: ${namespace} label: ${label} existingOwner: ${ownerAddress} newOwner: ${newOwner}`
+    `transferName: namespace: ${namespace} label: ${label} existingOwner: ${ownerAddress} newOwner: ${newOwner} ownerNonce: ${ownerNonce} walletNonce: ${walletNonce}`
   );
+  console.log(walletAccount);
+  console.log(ownerAccount);
 
   return contractWriteSponsored(
     "name-transfer",
