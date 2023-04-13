@@ -17,7 +17,9 @@ export default function SignUpHeader(props: { notifyMe: Function }) {
                   />
                 </span>
                 <p className="ml-3 font-medium text-white truncate">
-                  <span className="md:hidden">We announced a new product!</span>
+                  <span className="md:hidden">
+                    Be the first to know about the future of naming on Bitcoin.
+                  </span>
                   <span className="hidden md:inline">
                     Be the first to know about the future of naming on Bitcoin.
                   </span>
