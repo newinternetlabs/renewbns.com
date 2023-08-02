@@ -68,12 +68,13 @@ export async function renewName(name: string, price: number) {
   let namespace = tokens[1];
   let label = tokens[0];
   console.log(`namespace: ${namespace}, label: ${label}`);
+  console.log(price.toLocaleString('fullwide', {useGrouping:false}));
   return await contractWrite(
     "name-renewal",
     [
       bufferCVFromString(namespace),
       bufferCVFromString(label),
-      uintCV(price),
+      uintCV(price.toLocaleString('fullwide', {useGrouping:false})),
       noneCV(),
       noneCV(),
     ],
