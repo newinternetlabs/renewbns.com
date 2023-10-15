@@ -24,6 +24,7 @@ const Name = (props: {
   setShowNotifyModal: Function;
   subdomain: boolean;
 }) => {
+  console.log(props.address, props.address === "expired");
   return (
     <li>
       <UpgradeModal
@@ -95,14 +96,17 @@ const Name = (props: {
                         Upgrade name to Stacks 2.x
                       </button>
                     </div>
-                  ) : (
+                  ) : props.address !== "expired" ? (
                     <button
                       onClick={(e) => props.renew(e, props.name, props.price)}
                       type="button"
+                      disabled={props.address === "expired"}
                       className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                       Renew now
                     </button>
+                  ) : (
+                    <>Expired</>
                   )}
                 </>
               )}

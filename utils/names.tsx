@@ -43,11 +43,26 @@ export async function addressName(address: string) {
   ]);
   console.log("resolve-principal");
   console.log(result);
-  if (!result || !result.name || !result.name.value) return false;
+
+  if (!result || !result.name || result.code?.value === "2013") return false;
+  let nameResult;
+  if (result.code) {
+    // name from optional in error
+    if (result.name.value.value) {
+      nameResult = result.name.value.value;
+    }
+  } else {
+    // name from ok
+    nameResult = result;
+  }
+  if (!nameResult) {
+    return false;
+  }
+
   return (
-    Buffer.from(result.name.value.substr(2), "hex").toString("ascii") +
+    Buffer.from(nameResult.name.value.substr(2), "hex").toString("ascii") +
     "." +
-    Buffer.from(result.namespace.value.substr(2), "hex").toString("ascii")
+    Buffer.from(nameResult.namespace.value.substr(2), "hex").toString("ascii")
   );
 }
 
@@ -60,7 +75,7 @@ export async function resolveName(name: string) {
     bufferCVFromString(namespace),
     bufferCVFromString(label),
   ]);
-  return result !== "2013" ? result : false;
+  return result;
 }
 
 export async function renewName(name: string, price: number) {
@@ -68,13 +83,13 @@ export async function renewName(name: string, price: number) {
   let namespace = tokens[1];
   let label = tokens[0];
   console.log(`namespace: ${namespace}, label: ${label}`);
-  console.log(price.toLocaleString('fullwide', {useGrouping:false}));
+  console.log(price.toLocaleString("fullwide", { useGrouping: false }));
   return await contractWrite(
     "name-renewal",
     [
       bufferCVFromString(namespace),
       bufferCVFromString(label),
-      uintCV(price.toLocaleString('fullwide', {useGrouping:false})),
+      uintCV(price.toLocaleString("fullwide", { useGrouping: false })),
       noneCV(),
       noneCV(),
     ],
