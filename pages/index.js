@@ -180,11 +180,27 @@ class Index extends React.Component {
 
   resolveAndAddName(name, legacy) {
     resolveName(name).then((result) => {
-      console.log(result);
       fetch(`${NETWORK.coreApiUrl}/v2/prices/names/` + name).then(
         (response) => {
           return response.json().then((json) => {
             let price = parseInt(json.amount);
+            console.log(result);
+            if (result === "2013") {
+              return;
+            }
+            if (result === "2008") {
+              result = {
+                owner: { value: "expired" },
+                "lease-ending-at": { value: { value: "0" } },
+                "zonefile-hash": { value: "0x" },
+              };
+            } else if (result === "2009") {
+              result = {
+                owner: { value: this.state.address },
+                "lease-ending-at": { value: { value: "0" } },
+                "zonefile-hash": { value: "0x" },
+              };
+            }
             let zonefileHash = Buffer.from(
               result["zonefile-hash"].value.substr(2),
               "hex"
